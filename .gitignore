@@ -8,3 +8,5 @@ lazy-lock.json
 
 # Crush agent cache
 .crush/
+# Crush local settings
+.crush.json

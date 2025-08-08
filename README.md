@@ -239,3 +239,6 @@ sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
 ```
 </details>
 
+## Others
+scoop install extras/vcredist2022
+
