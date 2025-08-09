@@ -205,8 +205,6 @@ vim.keymap.set('n', '<C-S-l>', '<C-w>L', { desc = 'Move window to the right' })
 vim.keymap.set('n', '<C-S-j>', '<C-w>J', { desc = 'Move window to the lower' })
 vim.keymap.set('n', '<C-S-k>', '<C-w>K', { desc = 'Move window to the upper' })
 
-vim.cmd 'let g:sqlite_clib_path = "D:/sqlite-dll-win-x64-3470200/sqlite3.dll"'
-
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -346,6 +344,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
+        { '<leader>c', group = '[C]ode' },
         { '<leader>f', group = '[F]zf Lua' },
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
@@ -1034,6 +1033,7 @@ require('lazy').setup({
         -- 'latex',
         'typst',
         'yaml',
+        'python',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
@@ -1105,6 +1105,7 @@ require('lazy').setup({
 
 require 'custom.keybinds'
 require 'custom.autocommands'
+require 'custom.options'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

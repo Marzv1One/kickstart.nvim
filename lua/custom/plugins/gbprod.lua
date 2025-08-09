@@ -1,3 +1,5 @@
+vim.cmd 'let g:sqlite_clib_path = "D:/sqlite-dll-win-x64-3470200/sqlite3.dll"'
+
 return {
   {
     'gbprod/yanky.nvim',
