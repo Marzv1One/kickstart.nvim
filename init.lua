@@ -991,7 +991,6 @@ require('lazy').setup({
       require('mini.move').setup()
       require('mini.bufremove').setup()
 
-      -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
