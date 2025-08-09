@@ -56,6 +56,54 @@ return {
       map('n', '<leader>fn', function()
         require('fzf-lua').files { cwd = vim.fn.stdpath 'config' }
       end, { desc = 'NeoVim Files' })
+
+      local function get_named_buffers()
+        local buffers = vim.api.nvim_list_bufs()
+        local named_buffers = {}
+        for _, buf in ipairs(buffers) do
+          local name = vim.api.nvim_buf_get_name(buf)
+          -- if name ~= '' then
+          if vim.api.nvim_buf_get_option(buf, 'buflisted') then
+            table.insert(named_buffers, buf)
+          end
+        end
+        return named_buffers
+      end
+
+      map('n', '<leader>f/', function(opts_local)
+        -- local fzf = require 'fzf-lua'
+        opts_local = opts_local or {}
+        opts_local.cwd = '.'
+        opts_local.prompt = 'Rg> '
+        opts_local.get_icons = true
+        opts_local.file_icons = true
+        opts_local.color_icons = true
+
+        -- opts.actions = fzf_lua.defaults.actions.files
+        opts_local.actions = {
+          ['enter'] = fzf.actions.file_edit,
+          ['ctrl-y'] = fzf.actions.file_edit,
+          ['ctrl-v'] = fzf.actions.file_vsplit,
+        }
+        opts_local.previewer = 'builtin'
+        -- opts_local.fn_transform = function(x)
+        --   return fzf.make_entry.file(x, opts_local)
+        -- end
+
+        local open_buffers = get_named_buffers()
+        local glob_array = {}
+        for _, buf in ipairs(open_buffers) do
+          local buf_name = vim.api.nvim_buf_get_name(buf)
+          local relative_path = vim.fn.fnamemodify(buf_name, ':.')
+          relative_path = vim.fn.tr(relative_path, '\\', '/')
+          table.insert(glob_array, '--glob=' .. relative_path)
+        end
+
+        print(vim.inspect(glob_array))
+
+        opts_local.rg_opts = '--column --line-number --no-heading --color=always --smart-case ' .. table.concat(glob_array, ' ')
+        fzf.live_grep(opts_local)
+      end)
     end,
   },
 }
