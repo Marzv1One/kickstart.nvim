@@ -1,3 +1,4 @@
+local actions = require 'fzf-lua.actions'
 return {
   {
     'ibhagwan/fzf-lua',
@@ -22,6 +23,82 @@ return {
       lsp = {
         code_actions = {
           previewer = 'codeaction_native',
+        },
+      },
+      helptags = {
+        actions = {
+          ['ctrl-y'] = actions.help,
+          ['enter'] = actions.help,
+        },
+      },
+      builtin = {
+        actions = {
+          ['ctrl-y'] = actions.run_builtin,
+          ['enter'] = actions.run_builtin,
+        },
+      },
+      marks = {
+        actions = {
+          ['ctrl-y'] = actions.goto_mark,
+          ['enter'] = actions.goto_mark,
+        },
+      },
+      jumps = {
+        actions = {
+          ['ctrl-y'] = actions.goto_jump,
+          ['enter'] = actions.goto_jump,
+        },
+      },
+      registers = {
+        actions = {
+          ['ctrl-y'] = actions.paste_register,
+          ['enter'] = actions.paste_register,
+        },
+      },
+      keymaps = {
+        actions = {
+          ['ctrl-y'] = actions.keymap_apply,
+          ['enter'] = actions.keymap_apply,
+        },
+      },
+      spell_suggest = {
+        actions = {
+          ['ctrl-y'] = actions.spell_apply,
+          ['enter'] = actions.spell_apply,
+        },
+      },
+      filetypes = {
+        actions = {
+          ['ctrl-y'] = actions.set_filetype,
+          ['enter'] = actions.set_filetype,
+        },
+      },
+      search_history = {
+        actions = {
+          ['ctrl-y'] = actions.search_cr,
+          ['enter'] = actions.search_cr,
+        },
+      },
+      commands = {
+        actions = {
+          ['ctrl-y'] = actions.ex_run_cr,
+          ['enter'] = actions.ex_run_cr,
+
+          ['ctrl-e'] = actions.ex_run,
+        },
+      },
+      command_history = {
+        actions = {
+          ['ctrl-y'] = actions.ex_run_cr,
+          ['enter'] = actions.ex_run_cr,
+        },
+      },
+      actions = {
+        files = {
+          ['ctrl-y'] = actions.file_edit_or_qf,
+          ['enter'] = actions.file_edit_or_qf,
+          ['ctrl-v'] = actions.file_vsplit,
+          ['alt-q'] = actions.file_sel_to_qf,
         },
       },
     },
@@ -59,15 +136,14 @@ return {
 
       local function get_named_buffers()
         local buffers = vim.api.nvim_list_bufs()
-        local named_buffers = {}
+        local listed_buffers = {}
         for _, buf in ipairs(buffers) do
-          local name = vim.api.nvim_buf_get_name(buf)
-          -- if name ~= '' then
+          local ok, buflisted = pcall(vim.api.nvim_get_option_value, 'buflisted', { buf = buf })
           if vim.api.nvim_buf_get_option(buf, 'buflisted') then
-            table.insert(named_buffers, buf)
+            table.insert(listed_buffers, buf)
           end
         end
-        return named_buffers
+        return listed_buffers
       end
 
       map('n', '<leader>f/', function(opts_local)
