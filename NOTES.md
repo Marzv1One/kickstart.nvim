@@ -13,6 +13,7 @@
 - [ ] arrow
 - [ ] kulala
 - [ ] transparent
+- [ ] treesj
 - [ ] focus
 - [ ] better diagnostics
 - [ ] window border highlight
