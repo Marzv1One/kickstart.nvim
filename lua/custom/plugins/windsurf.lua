@@ -32,7 +32,7 @@ return {
         return vim.fn['codeium#Clear']()
       end, { desc = 'Codeium Clear', expr = true, silent = true })
 
-      vim.keymap.set('i', '<C-a>', function()
+      vim.keymap.set('i', '<M-a>', function()
         return vim.fn['codeium#Complete']()
       end, { desc = 'Codeium Complete', expr = true, silent = true })
 
