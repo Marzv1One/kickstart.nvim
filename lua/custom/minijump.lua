@@ -297,7 +297,7 @@ MiniJump.smart_jump = function(backward, till)
     MiniJump.stop_jumping()
   end
 
-  print('brand new jump ' .. vim.inspect(BrandNewJump))
+  -- print('brand new jump ' .. vim.inspect(BrandNewJump))
   if BrandNewJump then
     MiniJump.state.jumping = false
     MiniJump.state.target = nil

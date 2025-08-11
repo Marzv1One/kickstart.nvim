@@ -621,6 +621,16 @@ require('lazy').setup({
               callback = vim.lsp.buf.clear_references,
             })
 
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = function()
+                vim.api.nvim_exec_autocmds('User', {
+                  pattern = 'LspRequestDR',
+                })
+              end,
+            })
+
             vim.api.nvim_create_autocmd('LspDetach', {
               group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
               callback = function(event2)
@@ -835,6 +845,9 @@ require('lazy').setup({
             'rafamadriz/friendly-snippets',
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
+              require('luasnip.loaders.from_vscode').lazy_load {
+                paths = 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets',
+              }
             end,
           },
         },
@@ -905,6 +918,11 @@ require('lazy').setup({
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'nerdfont' },
         providers = {
+          snippets = {
+            opts = {
+              search_paths = { 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets' },
+            },
+          },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           nerdfont = {
             module = 'blink-nerdfont',

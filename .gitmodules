@@ -1,0 +1,3 @@
+[submodule "lua/custom/nvim-dr-lsp"]
+	path = lua/custom/nvim-dr-lsp
+	url = https://github.com/Marzv1One/nvim-dr-lsp.git

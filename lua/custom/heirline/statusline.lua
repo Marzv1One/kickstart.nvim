@@ -106,6 +106,14 @@ local FileName = {
   },
 }
 
+local FileNameModifier = {
+  hl = function()
+    if vim.bo.modified then
+      return { fg = 'cyan', bold = true, force = true }
+    end
+  end,
+}
+
 local FileFlags = {
   {
     condition = function()
@@ -191,20 +199,20 @@ local Ruler = {
   -- %c = column number
   -- %P = percentage through file of displayed window
   provider = '%7(%l/%3L%):%2c %P',
+  hl = { fg = utils.get_highlight('Special').fg },
 }
 
 local ScrollBar = {
   static = {
-    -- sbar = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" },
-    sbar = { '🭶', '🭷', '🭸', '🭹', '🭺', '🭻' },
+    sbar = { '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█' },
   },
   provider = function(self)
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local lines = vim.api.nvim_buf_line_count(0)
-    local i = math.floor(curr_line / lines * (#self.sbar - 1)) + 1
-    return string.rep(self.sbar[i], 2)
+    local i = math.floor(curr_line / lines * #self.sbar) + 1
+    return self.sbar[i]
   end,
-  hl = { fg = 'blue', bg = 'bright_bg' },
+  hl = { fg = utils.get_highlight('Special').fg, bg = 'bright_bg' },
 }
 
 local LSPActive = {
@@ -317,13 +325,14 @@ local Diagnostics = {
   update = { 'DiagnosticChanged', 'BufEnter' },
   on_click = {
     callback = function()
-      require('trouble').toggle 'diagnostics'
+      -- require('trouble').toggle { mode = 'document_diagnostics' }
     end,
     name = 'heirline_diagnostics',
   },
   init = function(self)
     self.diagnostics = vim.diagnostic.count()
   end,
+  { provider = '![' },
   {
     provider = function(self)
       return self.diagnostics[1] and (icons.err .. self.diagnostics[1] .. ' ')
@@ -348,6 +357,7 @@ local Diagnostics = {
     end,
     hl = 'DiagnosticHint',
   },
+  { provider = ']' },
 }
 
 local Git = {
@@ -407,13 +417,32 @@ local Git = {
   },
 }
 
+-- local Snippets = {
+--   condition = function()
+--     return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
+--   end,
+--   provider = function()
+--     local forward = vim.snippet.active { direction = 1 } and ' ' or ''
+--     local backward = vim.snippet.active { direction = -1 } and ' ' or ''
+--     return backward .. forward
+--   end,
+--   hl = { fg = 'red', bold = true },
+-- }
 local Snippets = {
   condition = function()
     return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
   end,
   provider = function()
-    local forward = vim.snippet.active { direction = 1 } and ' ' or ''
-    local backward = vim.snippet.active { direction = -1 } and ' ' or ''
+    local ls = require 'luasnip'
+    -- local forward = (vim.fn['UltiSnips#CanJumpForwards']() == 1) and ' ' or ''
+    local right_arrow = ' 󰍟'
+    -- local right_arrow = ' ~>'
+    local left_arrow = '󰍞'
+    -- local left_arrow = '<~'
+    local forward = ls.expand_or_jumpable() and right_arrow or ''
+    -- local forward = ls.expandable() or ls.jumpable(1) and right_arrow or ''
+    -- local backward = (vim.fn['UltiSnips#CanJumpBackwards']() == 1) and ' ' or ''
+    local backward = ls.jumpable(-1) and left_arrow or ''
     return backward .. forward
   end,
   hl = { fg = 'red', bold = true },
@@ -496,27 +525,98 @@ local WorkDir = {
   hl = { fg = 'blue', bold = true },
   on_click = {
     callback = function()
-      vim.cmd 'Neotree toggle'
+      vim.cmd 'Oil .'
     end,
     name = 'heirline_workdir',
   },
   flexible = 1,
   {
     provider = function(self)
-      local trail = self.cwd:sub(-1) == '/' and '' or '/'
+      -- local trail = self.cwd:sub(-1) == '/' and '' or '/'
+      local trail = self.cwd:sub(-1) == '\\' and '' or '\\'
       return self.icon .. self.cwd .. trail .. ' '
     end,
   },
   {
     provider = function(self)
       local cwd = vim.fn.pathshorten(self.cwd)
-      local trail = self.cwd:sub(-1) == '/' and '' or '/'
+      -- local trail = self.cwd:sub(-1) == '/' and '' or '/'
+      local trail = self.cwd:sub(-1) == '\\' and '' or '\\'
       return self.icon .. cwd .. trail .. ' '
     end,
   },
   {
     provider = '',
   },
+}
+
+local CodeiumStatus = {
+  condition = function()
+    return not conditions.buffer_matches {
+      filetype = { 'dashboard' },
+    }
+  end,
+  hl = { fg = 'cyan' },
+  provider = function()
+    return '󰚩 ' .. vim.fn['codeium#GetStatusString']()
+  end,
+}
+
+local DRLSPStatus = {
+  condition = conditions.lsp_attached(),
+  {
+    update = {
+      'User',
+      pattern = 'DefsCounted',
+      callback = function(self, args)
+        self.state = args.data
+        vim.schedule(function()
+          vim.cmd 'redrawstatus'
+        end)
+      end,
+    },
+    provider = function(self)
+      local state = self.state
+      if state ~= nil then
+        local provider = ''
+        if state.file > 0 and state.workspace > 0 then
+          provider = string.format('%d/(%d)D', state.file, state.workspace)
+        elseif state.workspace > 0 then
+          provider = string.format('%dD', state.workspace)
+        else
+          return ''
+        end
+        return ' ' .. provider
+      end
+    end,
+  },
+  {
+    update = {
+      'User',
+      pattern = 'RefsCounted',
+      callback = function(self, args)
+        self.state = args.data
+        vim.schedule(function()
+          vim.cmd 'redrawstatus'
+        end)
+      end,
+    },
+    provider = function(self)
+      local state = self.state
+      if state ~= nil then
+        local provider = ''
+        if state.file > 0 and state.workspace > 0 then
+          provider = string.format('%d/(%d)R', state.file, state.workspace)
+        elseif state.workspace > 0 then
+          provider = string.format('%dR', state.workspace)
+        else
+          return ''
+        end
+        return ' ' .. provider
+      end
+    end,
+  },
+  hl = { fg = 'green', bold = true },
 }
 
 local HelpFilename = {
@@ -545,13 +645,13 @@ local TerminalName = {
       return vim.b.term_title
     end,
   },
-  {
-    provider = function()
-      local id = require('terminal'):current_term_index()
-      return ' ' .. (id or 'Exited')
-    end,
-    hl = { bold = true, fg = 'blue' },
-  },
+  -- {
+  --   provider = function()
+  --     local id = require('terminal'):current_term_index()
+  --     return ' ' .. (id or 'Exited')
+  --   end,
+  --   hl = { bold = true, fg = 'blue' },
+  -- },
 }
 
 local Spell = {
@@ -644,7 +744,8 @@ local Space = { provider = ' ' }
 
 ViMode = utils.surround({ separators.rounded_left, separators.rounded_right }, 'bright_bg', {
   MacroRec,
-  ViMode --[[ , Snippets ]],
+  ViMode,
+  Snippets,
   ShowCmd,
 })
 
@@ -659,11 +760,14 @@ local DefaultStatusline = {
   Git,
   Space,
   Diagnostics,
+  Space,
+  CodeiumStatus,
   Align,
   -- { flexible = 3,   { Navic, Space }, { provider = "" } },
-  Align,
+  -- Align,
   -- DAPMessages,
   LSPActive,
+  { flexible = 2, { DRLSPStatus }, { hl = { fg = 'green' }, provider = '..' } },
   -- VirtualEnv,
   Space,
   FileType,

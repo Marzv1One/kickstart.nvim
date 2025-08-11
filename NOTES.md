@@ -3,21 +3,22 @@
 ## Plugins to installed
 - [x] winsurf
 - [x] toogleterm
-- [ ] satellite
-- [ ] hearline (statusline)
+- [x] satellite
+- [x] hover
+- [x] hearline (statusline)
 - [ ] nvim-dap, dap-view
 - [ ] noice, trouble, twilight
 - [ ] nvim-ufo
 - [ ] column
-- [ ] nvim-spider, nvim-scissos, dr-lsp
+- [ ] nvim-spider, nvim-scissos, dr-lsp, origami
 - [ ] arrow
 - [ ] kulala
 - [ ] transparent
 - [ ] treesj
 - [ ] focus
-- [ ] better diagnostics
-- [ ] window border highlight
-- [ ] custom column cursor
+- [x] better diagnostics
+- [x] window border highlight
+- [ ] smooth cursor
 
 ## To Set up
 - [x] set pwsh as Neovim terminal
@@ -26,5 +27,8 @@
 - [ ] Fzf for yanky
 - [ ] Fzf for persisted
 - [ ] Kanagawa <3
-- [ ] sleek
-- [ ] xmllint
+- [x] sleek
+- [x] xmllint
+- [ ] down arrow nvim-ufo
+- [ ] emoji blink-cmp
+- [ ] fzf lua git
