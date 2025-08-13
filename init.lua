@@ -724,6 +724,14 @@ require('lazy').setup({
             },
           },
         },
+        marksman = {},
+        ltex = {
+          language = 'en-US',
+          dictionary = {
+            ['en-US'] = 'C:/Users/eduar/AppData/Local/nvim/.ltex/dictionary.txt',
+          },
+          enabled = { 'markdown', 'text' },
+        },
       }
 
       -- Ensure the servers and tools above are installed
@@ -1131,7 +1139,7 @@ require('lazy').setup({
 })
 
 require 'custom.keymaps'
-require 'custom.autocommands'
+require 'custom.commands'
 require 'custom.options'
 
 -- The line beneath this is called `modeline`. See `:help modeline`

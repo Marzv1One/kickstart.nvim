@@ -580,7 +580,7 @@ local DRLSPStatus = {
       if state ~= nil then
         local provider = ''
         if state.file > 0 and state.workspace > 0 then
-          provider = string.format('%d/(%d)D', state.file, state.workspace)
+          provider = string.format('%d(%d)D', state.file, state.workspace)
         elseif state.workspace > 0 then
           provider = string.format('%dD', state.workspace)
         else
@@ -606,7 +606,7 @@ local DRLSPStatus = {
       if state ~= nil then
         local provider = ''
         if state.file > 0 and state.workspace > 0 then
-          provider = string.format('%d/(%d)R', state.file, state.workspace)
+          provider = string.format('%d(%d)R', state.file, state.workspace)
         elseif state.workspace > 0 then
           provider = string.format('%dR', state.workspace)
         else

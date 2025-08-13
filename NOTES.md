@@ -8,9 +8,10 @@
 - [x] hearline (statusline)
 - [ ] nvim-dap, dap-view
 - [ ] noice, trouble, twilight
-- [ ] nvim-ufo
+- [x] nvim-ufo
+- [ ] navbuddy
 - [ ] column
-- [ ] nvim-spider, nvim-scissos, dr-lsp, origami
+- [x] nvim-spider, nvim-scissos, dr-lsp, origami
 - [ ] arrow
 - [ ] kulala
 - [ ] transparent
@@ -31,4 +32,8 @@
 - [x] xmllint
 - [ ] down arrow nvim-ufo
 - [ ] emoji blink-cmp
-- [ ] fzf lua git
+- [ ] FZF Lua git
+- [ ] JSON LSP
+- [ ] YAML LSP
+- [ ] TOML LSP
+
