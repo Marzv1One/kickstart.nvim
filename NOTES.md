@@ -20,6 +20,8 @@
 - [x] better diagnostics
 - [x] window border highlight
 - [ ] smooth cursor
+- [ ] inc-rename
+- [ ] transparent
 
 ## To Set up
 - [x] set pwsh as Neovim terminal

@@ -41,7 +41,7 @@ M.icons = {
   -- info = vim.fn.sign_getdefined('DiagnosticSignInfo')[1].text,
   info = '  ',
   -- hint = vim.fn.sign_getdefined('DiagnosticSignHint')[1].text,
-  hint = ' 󰌵 ',
+  hint = ' 󰌶 ',
 }
 
 M.separators = {

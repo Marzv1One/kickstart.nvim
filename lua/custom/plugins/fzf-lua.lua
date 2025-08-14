@@ -175,7 +175,7 @@ return {
           table.insert(glob_array, '--glob=' .. relative_path)
         end
 
-        print(vim.inspect(glob_array))
+        -- print(vim.inspect(glob_array))
 
         opts_local.rg_opts = '--column --line-number --no-heading --color=always --smart-case ' .. table.concat(glob_array, ' ')
         fzf.live_grep(opts_local)

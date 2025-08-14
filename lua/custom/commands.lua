@@ -120,7 +120,7 @@ end, { nargs = '?' })
 --   :SpawnGlow ~/file.md   -> Runs 'glow --line-numbers tui' on ~/file.md
 vim.api.nvim_create_user_command('SpawnGlow', function(opts)
   local filepath = opts.args ~= '' and opts.args or ''
-  local git_root = vim.trim(vim.fn.system({'git', 'rev-parse', '--show-toplevel'}))
+  local git_root = vim.trim(vim.fn.system { 'git', 'rev-parse', '--show-toplevel' })
   local cwd = vim.v.shell_error == 0 and git_root or '.'
 
   vim.system({
@@ -174,5 +174,27 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt_local.softtabstop = 4
     vim.opt_local.shiftwidth = 4
     vim.opt_local.expandtab = true
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  pattern = '*',
+  callback = function()
+    local data = { file = 0, workspace = 0 }
+    vim.api.nvim_exec_autocmds('User', {
+      pattern = 'RefsCounted',
+      data = data,
+    })
+    vim.api.nvim_exec_autocmds('User', {
+      pattern = 'DefsCounted',
+      data = data,
+    })
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  pattern = { 'dap-view', 'dap-view-term', 'dap-repl', 'dap-float' }, -- dap-repl is set by `nvim-dap`
+  callback = function(args)
+    vim.keymap.set('n', 'q', '<C-w>q', { buffer = args.buf })
   end,
 })

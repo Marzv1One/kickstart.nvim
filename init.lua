@@ -660,25 +660,33 @@ require('lazy').setup({
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
-            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.ERROR] = '󰅘 ',
             [vim.diagnostic.severity.WARN] = '󰀪 ',
             [vim.diagnostic.severity.INFO] = '󰋽 ',
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
+          linehl = {
+            [vim.diagnostic.severity.ERROR] = 'ErrorMsg',
+          },
+          numhl = {
+            [vim.diagnostic.severity.ERROR] = 'ErrorMsg',
+            [vim.diagnostic.severity.WARN] = 'WarningMsg',
+          },
         } or {},
-        virtual_text = {
-          source = 'if_many',
-          spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
-        },
+        virtual_text = false,
+        -- virtual_text = {
+        --   source = 'if_many',
+        --   spacing = 2,
+        --   format = function(diagnostic)
+        --     local diagnostic_message = {
+        --       [vim.diagnostic.severity.ERROR] = diagnostic.message,
+        --       [vim.diagnostic.severity.WARN] = diagnostic.message,
+        --       [vim.diagnostic.severity.INFO] = diagnostic.message,
+        --       [vim.diagnostic.severity.HINT] = diagnostic.message,
+        --     }
+        --     return diagnostic_message[diagnostic.severity]
+        --   end,
+        -- },
       }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -858,6 +866,8 @@ require('lazy').setup({
               }
             end,
           },
+          { 'marcoSven/blink-cmp-yanky' },
+          { 'moyiz/blink-emoji.nvim' },
         },
         opts = {},
       },
@@ -924,13 +934,13 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'nerdfont' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'yank', 'nerdfont', 'emoji' },
         providers = {
-          snippets = {
-            opts = {
-              search_paths = { 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets' },
-            },
-          },
+          -- snippets = {
+          --   opts = {
+          --     search_paths = { 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets' },
+          --   },
+          -- },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           nerdfont = {
             module = 'blink-nerdfont',
@@ -938,6 +948,36 @@ require('lazy').setup({
             opts = {
               insert = true,
             },
+          },
+          yank = {
+            name = 'yank',
+            module = 'blink-yanky',
+            opts = {
+              minLength = 5,
+              onlyCurrentFiletype = true,
+              trigger_characters = { '"' },
+              kind_icon = '󰅍',
+            },
+          },
+          emoji = {
+            module = 'blink-emoji',
+            name = 'Emoji',
+            score_offset = 15, -- Tune by preference
+            opts = {
+              insert = true, -- Insert emoji (default) or complete its name
+              ---@type string|table|fun():table
+              trigger = function()
+                return { ':' }
+              end,
+            },
+            -- should_show_items = function()
+            --   return vim.tbl_contains(
+            --     -- Enable emoji completion only for git commits and markdown.
+            --     -- By default, enabled for all file-types.
+            --     { 'gitcommit', 'markdown' },
+            --     vim.o.filetype
+            --   )
+            -- end,
           },
         },
       },
