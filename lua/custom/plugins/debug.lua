@@ -20,6 +20,7 @@ end
 return {
   {
     'mfussenegger/nvim-dap',
+    ft = { 'cs' },
     dependencies = {
       'theHamsta/nvim-dap-virtual-text',
       {

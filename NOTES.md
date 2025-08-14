@@ -6,35 +6,35 @@
 - [x] satellite
 - [x] hover
 - [x] hearline (statusline)
-- [ ] nvim-dap, dap-view
-- [ ] noice, trouble, twilight
+- [x] nvim-dap, dap-view
+- [x] noice, trouble, twilight
 - [x] nvim-ufo
 - [ ] navbuddy
-- [ ] column
+- [ ] smart-column
 - [x] nvim-spider, nvim-scissos, dr-lsp, origami
 - [ ] arrow
 - [ ] kulala
 - [ ] transparent
 - [ ] treesj
-- [ ] focus
+- [x] focus
 - [x] better diagnostics
 - [x] window border highlight
 - [ ] smooth cursor
-- [ ] inc-rename
+- [x] inc-rename
 - [ ] transparent
 
 ## To Set up
 - [x] set pwsh as Neovim terminal
-- [ ] Fzf for gopass
-- [ ] Debugger for dotnet
+- [x] Fzf for gopass
+- [x] Debugger for dotnet
 - [ ] Fzf for yanky
 - [ ] Fzf for persisted
 - [ ] Kanagawa <3
 - [x] sleek
 - [x] xmllint
 - [ ] down arrow nvim-ufo
-- [ ] emoji blink-cmp
-- [ ] FZF Lua git
+- [x] emoji blink-cmp
+- [ ] FZF Lua git + toggleterm
 - [ ] JSON LSP
 - [ ] YAML LSP
 - [ ] TOML LSP

@@ -166,6 +166,8 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+vim.g.vsnip_snippet_dirs = { 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets' }
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -344,9 +346,13 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
+        { '<leader>T', group = '[T]erminal' },
         { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]iagnostics' },
         { '<leader>f', group = '[F]zf Lua' },
-        { '<leader>s', group = '[S]earch' },
+        { '<leader>g', group = '[G]it' },
+        { '<leader>r', group = '[R]ename' },
+        -- { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
@@ -450,12 +456,12 @@ require('lazy').setup({
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
-      end, { desc = '[S]earch [/] in Open Files' })
+      -- vim.keymap.set('n', '<leader>s/', function()
+      --   builtin.live_grep {
+      --     grep_open_files = true,
+      --     prompt_title = 'Live Grep in Open Files',
+      --   }
+      -- end, { desc = '[S]earch [/] in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
       -- vim.keymap.set('n', '<leader>sn', function()
@@ -489,7 +495,7 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim', opts = {} },
+      -- { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
@@ -1109,6 +1115,7 @@ require('lazy').setup({
         'typst',
         'yaml',
         'python',
+        'regex',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,

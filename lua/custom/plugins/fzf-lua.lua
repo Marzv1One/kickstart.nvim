@@ -122,64 +122,85 @@ return {
       map('n', '<leader>fh', require('fzf-lua').helptags, { desc = 'Help Tags' })
       map('n', '<leader>fk', require('fzf-lua').keymaps, { desc = 'Keymaps' })
       map('n', '<leader>ff', require('fzf-lua').files, { desc = 'Files' })
-      map('n', '<leader>fs', require('fzf-lua').builtin, { desc = 'Builtin' })
+      map('n', '<leader>fb', require('fzf-lua').builtin, { desc = 'Builtin' })
       map('n', '<leader>fw', require('fzf-lua').grep_cword, { desc = 'Grep Word' })
       map('n', '<leader>fg', require('fzf-lua').live_grep, { desc = 'Live Grep' })
       map('n', '<leader>fd', require('fzf-lua').diagnostics_document, { desc = 'Diagnostics' })
       map('n', '<leader>fr', require('fzf-lua').resume, { desc = 'Resume' })
       map('n', '<leader>f.', require('fzf-lua').oldfiles, { desc = 'Old Files' })
       map('n', '<leader><leader>', require('fzf-lua').buffers, { desc = 'Buffers' })
-      map('n', '<leader>/', require('fzf-lua').lines, { desc = 'Lines' })
+      map('n', '<leader>/', require('fzf-lua').blines, { desc = 'Buffer Lines' })
+      map('n', '<leader>f/', require('fzf-lua').lines, { desc = 'Lines' })
       map('n', '<leader>fn', function()
         require('fzf-lua').files { cwd = vim.fn.stdpath 'config' }
       end, { desc = 'NeoVim Files' })
+      map('n', '<leader>fc', require('fzf-lua').commands, { desc = 'Commands' })
+      map('n', '<leader>fq', require('fzf-lua').quickfix, { desc = 'Quickfix' })
+      map('n', '<leader>fl', require('fzf-lua').loclist, { desc = 'Loclist' })
+      map('n', '<leader>fm', require('fzf-lua').marks, { desc = 'Marks' })
+      map('n', '<leader>fs', require('fzf-lua').search_history, { desc = 'Search History' })
+      map('n', '<leader>fx', require('fzf-lua').command_history, { desc = 'Command History' })
+      map('n', '<leader>fj', require('fzf-lua').jumps, { desc = 'Jumps' })
+      map('n', '<leader>fy', require('fzf-lua').registers, { desc = 'Registers' })
+      map('n', '<leader>fz', require('fzf-lua').spell_suggest, { desc = 'Spell Suggest' })
 
-      local function get_named_buffers()
-        local buffers = vim.api.nvim_list_bufs()
-        local listed_buffers = {}
-        for _, buf in ipairs(buffers) do
-          local ok, buflisted = pcall(vim.api.nvim_get_option_value, 'buflisted', { buf = buf })
-          if vim.api.nvim_buf_get_option(buf, 'buflisted') then
-            table.insert(listed_buffers, buf)
-          end
-        end
-        return listed_buffers
-      end
+      -- FzfLua Git keymaps
+      map('n', '<leader>gf', require('fzf-lua').git_files, { desc = 'Git Files' })
+      map('n', '<leader>gc', require('fzf-lua').git_commits, { desc = 'Git Commits' })
+      map('n', '<leader>gb', require('fzf-lua').git_bcommits, { desc = 'Git Buffer Commits' })
+      map('n', '<leader>gs', require('fzf-lua').git_status, { desc = 'Git Status' })
+      map('n', '<leader>gd', require('fzf-lua').git_diff, { desc = 'Git Diff' })
+      map('n', '<leader>gh', require('fzf-lua').git_hunks, { desc = 'Git Hunks' })
+      map('n', '<leader>gl', require('fzf-lua').git_branches, { desc = 'Git Branches' })
+      map('n', '<leader>gt', require('fzf-lua').git_stash, { desc = 'Git Stash' })
+      map('n', '<leader>gn', require('fzf-lua').git_blame, { desc = 'Git Blame' })
 
-      map('n', '<leader>f/', function(opts_local)
-        -- local fzf = require 'fzf-lua'
-        opts_local = opts_local or {}
-        opts_local.cwd = '.'
-        opts_local.prompt = 'Rg> '
-        opts_local.get_icons = true
-        opts_local.file_icons = true
-        opts_local.color_icons = true
-
-        -- opts.actions = fzf_lua.defaults.actions.files
-        opts_local.actions = {
-          ['enter'] = fzf.actions.file_edit,
-          ['ctrl-y'] = fzf.actions.file_edit,
-          ['ctrl-v'] = fzf.actions.file_vsplit,
-        }
-        opts_local.previewer = 'builtin'
-        -- opts_local.fn_transform = function(x)
-        --   return fzf.make_entry.file(x, opts_local)
-        -- end
-
-        local open_buffers = get_named_buffers()
-        local glob_array = {}
-        for _, buf in ipairs(open_buffers) do
-          local buf_name = vim.api.nvim_buf_get_name(buf)
-          local relative_path = vim.fn.fnamemodify(buf_name, ':.')
-          relative_path = vim.fn.tr(relative_path, '\\', '/')
-          table.insert(glob_array, '--glob=' .. relative_path)
-        end
-
-        -- print(vim.inspect(glob_array))
-
-        opts_local.rg_opts = '--column --line-number --no-heading --color=always --smart-case ' .. table.concat(glob_array, ' ')
-        fzf.live_grep(opts_local)
-      end)
+      -- local function get_named_buffers()
+      --   local buffers = vim.api.nvim_list_bufs()
+      --   local listed_buffers = {}
+      --   for _, buf in ipairs(buffers) do
+      --     local ok, buflisted = pcall(vim.api.nvim_get_option_value, 'buflisted', { buf = buf })
+      --     if vim.api.nvim_buf_get_option(buf, 'buflisted') then
+      --       table.insert(listed_buffers, buf)
+      --     end
+      --   end
+      --   return listed_buffers
+      -- end
+      --
+      -- map('n', '<leader>f/', function(opts_local)
+      --   -- local fzf = require 'fzf-lua'
+      --   opts_local = opts_local or {}
+      --   opts_local.cwd = '.'
+      --   opts_local.prompt = 'Rg> '
+      --   opts_local.get_icons = true
+      --   opts_local.file_icons = true
+      --   opts_local.color_icons = true
+      --
+      --   -- opts.actions = fzf_lua.defaults.actions.files
+      --   opts_local.actions = {
+      --     ['enter'] = fzf.actions.file_edit,
+      --     ['ctrl-y'] = fzf.actions.file_edit,
+      --     ['ctrl-v'] = fzf.actions.file_vsplit,
+      --   }
+      --   opts_local.previewer = 'builtin'
+      --   -- opts_local.fn_transform = function(x)
+      --   --   return fzf.make_entry.file(x, opts_local)
+      --   -- end
+      --
+      --   local open_buffers = get_named_buffers()
+      --   local glob_array = {}
+      --   for _, buf in ipairs(open_buffers) do
+      --     local buf_name = vim.api.nvim_buf_get_name(buf)
+      --     local relative_path = vim.fn.fnamemodify(buf_name, ':.')
+      --     relative_path = vim.fn.tr(relative_path, '\\', '/')
+      --     table.insert(glob_array, '--glob=' .. relative_path)
+      --   end
+      --
+      --   -- print(vim.inspect(glob_array))
+      --
+      --   opts_local.rg_opts = '--column --line-number --no-heading --color=always --smart-case ' .. table.concat(glob_array, ' ')
+      --   fzf.live_grep(opts_local)
+      -- end)
     end,
   },
 }

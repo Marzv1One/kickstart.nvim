@@ -116,8 +116,8 @@ end, { nargs = '?' })
 
 -- Spawn `glow` for a file in new Wezterm window
 -- Usage:
---   :SpawnGlow             -> Runs 'glow --line-numbers tui' in root Git directory
---   :SpawnGlow ~/file.md   -> Runs 'glow --line-numbers tui' on ~/file.md
+--   :SpawnGlow             -> Runs 'glow --line-numbers --tui' in root Git directory
+--   :SpawnGlow ~/file.md   -> Runs 'glow --line-numbers --tui' on ~/file.md
 vim.api.nvim_create_user_command('SpawnGlow', function(opts)
   local filepath = opts.args ~= '' and opts.args or ''
   local git_root = vim.trim(vim.fn.system { 'git', 'rev-parse', '--show-toplevel' })
@@ -133,7 +133,7 @@ vim.api.nvim_create_user_command('SpawnGlow', function(opts)
   }, { text = true }, function(spawn_res)
     local pane_id = vim.trim(spawn_res.stdout)
     if pane_id ~= '' then
-      local cmd = filepath ~= '' and 'glow --line-numbers tui ' .. filepath or 'glow --line-numbers tui'
+      local cmd = filepath ~= '' and 'glow --line-numbers --tui ' .. filepath or 'glow --line-numbers --tui'
       vim.system({
         'wezterm',
         'cli',

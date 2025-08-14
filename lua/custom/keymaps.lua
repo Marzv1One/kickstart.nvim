@@ -27,9 +27,6 @@ map('v', '>', '>gv', { desc = 'Indent right' })
 map('n', '{', '{zz', { desc = 'Through empty lines' })
 map('n', '}', '}zz', { desc = 'Through empty lines' })
 
--- Unicode unescaping
-map('n', '<leader>u', '<cmd>UnescapeUnicode<CR>', { desc = 'Unescape Unicode characters' })
-
 -- Spawn commands in Wezterm
 map('n', '<leader>Tc', '<cmd>SpawnCrush<CR>', { desc = 'Spawn Crush in new Wezterm window' })
 map('n', '<leader>Tg', '<cmd>SpawnLazygit<CR>', { desc = 'Spawn Lazygit in new Wezterm window' })
@@ -38,6 +35,14 @@ map('n', '<leader>Ts', '<cmd>SpawnSpf<CR>', { desc = 'Spawn Superfile in new Wez
 map('n', '<leader>Tm', '<cmd>SpawnGlow<CR>', { desc = 'Spawn Glow in new Wezterm window' })
 map('n', '<leader>Tt', '<cmd>SpawnTerm<CR>', { desc = 'Spawn new Wezterm window' })
 
--- Optional: Add visual mode mappings for commands that might work with selections
-map('v', '<leader>u', ':UnescapeUnicode<CR>', { desc = 'Unescape Unicode in selection' })
+-- Gopass integration
+map('n', '<leader>gp', '<cmd>luafile ~/.config/nvim/after/plugin/fzf-lua/gopass.lua<CR>', { desc = 'Gopass menu', silent = true })
 
+-- Optional: Add visual mode mappings for commands that might work with selections
+-- map('v', '<leader>u', ':UnescapeUnicode<CR>', { desc = 'Unescape Unicode in selection' })
+
+-- Incremental Rename
+vim.keymap.set('n', '<leader>rr', ':IncRename ')
+vim.keymap.set('n', '<leader>rn', function()
+  return ':IncRename ' .. vim.fn.expand '<cword>'
+end, { expr = true })

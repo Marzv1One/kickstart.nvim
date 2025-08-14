@@ -93,10 +93,10 @@ return {
       map(']Z', function()
         require('ufo').goNextClosedFold()
       end, 'Next closed fold')
-      map('<leader>zz', function()
+      map('<leader>uz', function()
         require('ufo').disableFold(vim.api.nvim_get_current_buf())
       end, 'Disable fold')
-      map('<leader>zZ', function()
+      map('<leader>uZ', function()
         require('ufo').enableFold(vim.api.nvim_get_current_buf())
       end, 'Enable fold')
     end,
