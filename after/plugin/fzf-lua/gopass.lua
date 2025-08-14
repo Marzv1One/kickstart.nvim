@@ -38,4 +38,4 @@ vim.api.nvim_create_user_command('Gopass', function()
 end, {})
 
 -- Add keybinding for gopass command
-vim.keymap.set('n', '<leader>pm', '<cmd>Gopass<CR>', { noremap = true, silent = true, desc = 'Gopass' })
+vim.keymap.set('n', '<leader>P', '<cmd>Gopass<CR>', { noremap = true, silent = true })

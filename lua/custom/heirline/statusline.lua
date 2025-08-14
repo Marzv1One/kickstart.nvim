@@ -721,17 +721,6 @@ local ShowCmd = {
   end,
 }
 
-local NoiceMode = {
-  condition = require('noice').api.status.command.has,
-  provider = require('noice').api.status.command.get,
-  hl = { fg = 'red', bold = true },
-}
-local NoiceSearch = {
-  condition = require('noice').api.status.search.has,
-  provider = require('noice').api.status.search.get,
-  hl = { fg = 'red', bold = true },
-}
-
 -- local VirtualEnv = {
 --     init = function(self)
 --         if not self.timer then

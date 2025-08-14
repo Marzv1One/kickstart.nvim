@@ -93,6 +93,12 @@ return {
           ['enter'] = actions.ex_run_cr,
         },
       },
+      highlights = {
+        actions = {
+          ['ctrl-y'] = actions.hi,
+          ['enter'] = actions.hi,
+        },
+      },
       actions = {
         files = {
           ['ctrl-y'] = actions.file_edit_or_qf,
@@ -118,42 +124,46 @@ return {
       end)
 
       local map = vim.keymap.set
+      local fzf = require 'fzf-lua'
 
-      map('n', '<leader>fh', require('fzf-lua').helptags, { desc = 'Help Tags' })
-      map('n', '<leader>fk', require('fzf-lua').keymaps, { desc = 'Keymaps' })
-      map('n', '<leader>ff', require('fzf-lua').files, { desc = 'Files' })
-      map('n', '<leader>fb', require('fzf-lua').builtin, { desc = 'Builtin' })
-      map('n', '<leader>fw', require('fzf-lua').grep_cword, { desc = 'Grep Word' })
-      map('n', '<leader>fg', require('fzf-lua').live_grep, { desc = 'Live Grep' })
-      map('n', '<leader>fd', require('fzf-lua').diagnostics_document, { desc = 'Diagnostics' })
-      map('n', '<leader>fr', require('fzf-lua').resume, { desc = 'Resume' })
-      map('n', '<leader>f.', require('fzf-lua').oldfiles, { desc = 'Old Files' })
-      map('n', '<leader><leader>', require('fzf-lua').buffers, { desc = 'Buffers' })
-      map('n', '<leader>/', require('fzf-lua').blines, { desc = 'Buffer Lines' })
-      map('n', '<leader>f/', require('fzf-lua').lines, { desc = 'Lines' })
+      map('n', '<leader>fh', fzf.helptags, { desc = 'Help Tags' })
+      map('n', '<leader>fk', fzf.keymaps, { desc = 'Keymaps' })
+      map('n', '<leader>ff', fzf.files, { desc = 'Files' })
+      map('n', '<leader>fb', fzf.builtin, { desc = 'Builtin' })
+      map('n', '<leader>fw', fzf.grep_cword, { desc = 'Grep Word' })
+      map('n', '<leader>fg', fzf.live_grep, { desc = 'Live Grep' })
+      map('n', '<leader>fd', fzf.diagnostics_document, { desc = 'Diagnostics' })
+      map('n', '<leader>fr', fzf.resume, { desc = 'Resume' })
+      map('n', '<leader>f.', fzf.oldfiles, { desc = 'Old Files' })
+      map('n', '<leader><leader>', fzf.buffers, { desc = 'Buffers' })
+      map('n', '<leader>/', fzf.blines, { desc = 'Buffer Lines' })
+      map('n', '<leader>f/', fzf.lines, { desc = 'Lines' })
       map('n', '<leader>fn', function()
-        require('fzf-lua').files { cwd = vim.fn.stdpath 'config' }
+        fzf.files { cwd = vim.fn.stdpath 'config' }
       end, { desc = 'NeoVim Files' })
-      map('n', '<leader>fc', require('fzf-lua').commands, { desc = 'Commands' })
-      map('n', '<leader>fq', require('fzf-lua').quickfix, { desc = 'Quickfix' })
-      map('n', '<leader>fl', require('fzf-lua').loclist, { desc = 'Loclist' })
-      map('n', '<leader>fm', require('fzf-lua').marks, { desc = 'Marks' })
-      map('n', '<leader>fs', require('fzf-lua').search_history, { desc = 'Search History' })
-      map('n', '<leader>fx', require('fzf-lua').command_history, { desc = 'Command History' })
-      map('n', '<leader>fj', require('fzf-lua').jumps, { desc = 'Jumps' })
-      map('n', '<leader>fy', require('fzf-lua').registers, { desc = 'Registers' })
-      map('n', '<leader>fz', require('fzf-lua').spell_suggest, { desc = 'Spell Suggest' })
+      map('n', '<leader>fc', fzf.commands, { desc = 'Commands' })
+      map('n', '<leader>fq', fzf.quickfix, { desc = 'Quickfix' })
+      map('n', '<leader>fl', fzf.loclist, { desc = 'Loclist' })
+      map('n', '<leader>fm', fzf.marks, { desc = 'Marks' })
+      map('n', '<leader>fs', fzf.search_history, { desc = 'Search History' })
+      map('n', '<leader>fx', fzf.command_history, { desc = 'Command History' })
+      map('n', '<leader>fj', fzf.jumps, { desc = 'Jumps' })
+      map('n', '<leader>fy', fzf.registers, { desc = 'Registers' })
+      map('n', '<leader>fz', fzf.spell_suggest, { desc = 'Spell Suggest' })
+      map('n', '<leader>fW', fzf.grep_cWORD, { desc = 'Grep WORD' })
+      map('n', '<leader>fi', fzf.highlights, { desc = 'Highlights' })
+      map('v', '<leader>fw', fzf.grep_visual, { desc = 'Grep Visual' })
 
       -- FzfLua Git keymaps
-      map('n', '<leader>gf', require('fzf-lua').git_files, { desc = 'Git Files' })
-      map('n', '<leader>gc', require('fzf-lua').git_commits, { desc = 'Git Commits' })
-      map('n', '<leader>gb', require('fzf-lua').git_bcommits, { desc = 'Git Buffer Commits' })
-      map('n', '<leader>gs', require('fzf-lua').git_status, { desc = 'Git Status' })
-      map('n', '<leader>gd', require('fzf-lua').git_diff, { desc = 'Git Diff' })
-      map('n', '<leader>gh', require('fzf-lua').git_hunks, { desc = 'Git Hunks' })
-      map('n', '<leader>gl', require('fzf-lua').git_branches, { desc = 'Git Branches' })
-      map('n', '<leader>gt', require('fzf-lua').git_stash, { desc = 'Git Stash' })
-      map('n', '<leader>gn', require('fzf-lua').git_blame, { desc = 'Git Blame' })
+      map('n', '<leader>gf', fzf.git_files, { desc = 'Git Files' })
+      map('n', '<leader>gc', fzf.git_commits, { desc = 'Git Commits' })
+      map('n', '<leader>gb', fzf.git_bcommits, { desc = 'Git Buffer Commits' })
+      map('n', '<leader>gs', fzf.git_status, { desc = 'Git Status' })
+      map('n', '<leader>gd', fzf.git_diff, { desc = 'Git Diff' })
+      map('n', '<leader>gh', fzf.git_hunks, { desc = 'Git Hunks' })
+      map('n', '<leader>gl', fzf.git_branches, { desc = 'Git Branches' })
+      map('n', '<leader>gt', fzf.git_stash, { desc = 'Git Stash' })
+      map('n', '<leader>gn', fzf.git_blame, { desc = 'Git Blame' })
 
       -- local function get_named_buffers()
       --   local buffers = vim.api.nvim_list_bufs()

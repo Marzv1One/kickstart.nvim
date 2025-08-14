@@ -2,7 +2,7 @@ return {
   'rebelot/kanagawa.nvim',
   lazy = false,
   priority = 1000,
-  enabled = false,
+  enabled = true,
   init = function()
     vim.cmd 'colorscheme kanagawa-wave'
   end,
@@ -13,7 +13,7 @@ return {
         theme = {
           dragon = {
             ui = {
-              -- fg = '#DCD7BA',
+              fg = '#DCD7BA',
             },
             syn = {
               special3 = '#FF5D62',
@@ -126,7 +126,7 @@ return {
             bold = true,
             underline = true,
           },
-          EyelinerDimmed = { link = 'Twilight' },
+          EyelinerDimmed = { fg = c(theme.ui.fg_dim):blend(theme.ui.bg, 0.85):to_hex() },
           MatchParen = { fg = theme.syn.special2, bold = true },
           -- MatchParen = { fg = theme.diag.warning, bold = true },
           CursorLineNr = { fg = theme.syn.number, bold = true },
@@ -156,9 +156,11 @@ return {
           SmoothCursorAqua = { fg = theme.term[7] },
           SmoothCursorRed = { fg = theme.term[2] },
 
-          Folded = { bg = 'none' },
+          Folded = {
+            bg = c(theme.ui.bg_m1):blend(theme.ui.bg_p1, 0.35):to_hex(),
+          },
           FoldColumn = {
-            bg = 'none',
+            -- bg = 'none',
             fg = theme.ui.special,
             bold = true,
           },
@@ -184,6 +186,11 @@ return {
           ['@bar.tsx'] = {
             link = '@tag.tsx',
           },
+
+          ['@comment.info'] = { fg = theme.diag.info },
+          -- ['@comment.hint'] = { fg = theme.diag.hint },
+          -- ['@comment.warning'] = { fg = theme.diag.warning },
+          -- ['@comment.error'] = { fg = theme.diag.error },
 
           ['@type'] = { fg = theme.syn.type, bold = true },
           ['@keyword.coroutine'] = { fg = theme.syn.type, bold = true },
@@ -244,7 +251,7 @@ return {
           vim.fn.sign_define('smoothcursor', { text = '' })
         elseif current_mode_name == 'C' then
           set_hl(0, 'SmoothCursor', { fg = theme.syn.special3 })
-          vim.fn.sign_define('smoothcursor', { text = '' })
+          vim.fn.sign_define('smoothcursor', { text = '' })
         elseif current_mode_name == 'V' then
           set_hl(0, 'SmoothCursor', { fg = theme.syn.special1 })
           vim.fn.sign_define('smoothcursor', { text = '' })

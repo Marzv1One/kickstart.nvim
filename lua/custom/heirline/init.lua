@@ -5,7 +5,8 @@ local icons = require('custom.heirline.common').icons
 
 local function setup_colors()
   return {
-    bright_bg = utils.get_highlight('Folded').bg,
+    bright_bg = utils.get_highlight('TabLineSel').bg,
+    -- bright_bg = utils.get_highlight('FoldColumn').bg,
     bright_fg = utils.get_highlight('Folded').fg,
     red = utils.get_highlight('DiagnosticError').fg,
     dark_red = utils.get_highlight('DiffDelete').bg,

@@ -765,7 +765,7 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'csharpier', -- Used to format C# code
-        'jq', -- Used to format json code
+        -- 'jq', -- Used to format json code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -940,7 +940,7 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'yank', 'nerdfont', 'emoji' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'easy-dotnet', 'yank', 'nerdfont', 'emoji' },
         providers = {
           -- snippets = {
           --   opts = {
@@ -985,6 +985,13 @@ require('lazy').setup({
             --   )
             -- end,
           },
+          ['easy-dotnet'] = {
+            name = 'easy-dotnet',
+            enabled = true,
+            module = 'easy-dotnet.completion.blink',
+            score_offset = 10000,
+            async = true,
+          },
         },
       },
 
@@ -997,7 +1004,7 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
@@ -1022,7 +1029,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
 
@@ -1116,6 +1123,8 @@ require('lazy').setup({
         'yaml',
         'python',
         'regex',
+        'sql',
+        'xml',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,

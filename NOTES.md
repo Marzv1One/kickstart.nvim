@@ -7,21 +7,23 @@
 - [x] hover
 - [x] hearline (statusline)
 - [x] nvim-dap, dap-view
-- [x] noice, trouble, twilight
+- [x] noice, trouble
 - [x] nvim-ufo
 - [ ] navbuddy
-- [ ] smart-column
+- [x] smart-column
 - [x] nvim-spider, nvim-scissos, dr-lsp, origami
 - [ ] arrow
 - [ ] kulala
-- [ ] transparent
+- [x] transparent
 - [ ] treesj
 - [x] focus
 - [x] better diagnostics
 - [x] window border highlight
-- [ ] smooth cursor
+- [x] smooth cursor
 - [x] inc-rename
-- [ ] transparent
+- [x] transparent
+- [ ] dashboard
+- [ ] hardtime
 
 ## To Set up
 - [x] set pwsh as Neovim terminal
@@ -29,6 +31,7 @@
 - [x] Debugger for dotnet
 - [ ] Fzf for yanky
 - [ ] Fzf for persisted
+- [ ] Fzf for undotree
 - [ ] Kanagawa <3
 - [x] sleek
 - [x] xmllint
