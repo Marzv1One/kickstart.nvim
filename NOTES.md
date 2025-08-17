@@ -9,13 +9,13 @@
 - [x] nvim-dap, dap-view
 - [x] noice, trouble
 - [x] nvim-ufo
-- [ ] navbuddy
+- [x] navbuddy
 - [x] smart-column
 - [x] nvim-spider, nvim-scissos, dr-lsp, origami
-- [ ] arrow
+- [x] arrow
 - [ ] kulala
 - [x] transparent
-- [ ] treesj
+- [x] treesj
 - [x] focus
 - [x] better diagnostics
 - [x] window border highlight
@@ -24,6 +24,15 @@
 - [x] transparent
 - [ ] dashboard
 - [ ] hardtime
+- [ ] WezTerm plugins
+- [ ] neo composer
+- [?] dial
+- [?] gx
+- [?] image preview
+- [ ] nvim ts autotag
+- [ ] peek
+- [?] treesitter playground
+- [?] crates
 
 ## To Set up
 - [x] set pwsh as Neovim terminal
@@ -42,3 +51,6 @@
 - [ ] YAML LSP
 - [ ] TOML LSP
 
+
+### other way to sync lazy
+nvim --headless "+Lazy sync" +qa

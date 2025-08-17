@@ -20,7 +20,7 @@ return {
         return vim.fn['codeium#AcceptNextLine']()
       end, { desc = 'Codeium Accept Next Line', expr = true, silent = true })
 
-      vim.keymap.set('i', '<M-r>', function()
+      vim.keymap.set('i', '<M-n>', function()
         return vim.fn['codeium#CycleCompletions'](1)
       end, { desc = 'Codeium Cycle Completions', expr = true, silent = true })
 

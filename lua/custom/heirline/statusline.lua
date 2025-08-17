@@ -654,6 +654,21 @@ local TerminalName = {
   -- },
 }
 
+local Arrow = {
+  {
+    condition = function()
+      return require('arrow.statusline').is_on_arrow_file(vim.api.nvim_buf_get_name(0)) ~= nil
+    end,
+    provider = ' ',
+  },
+  {
+    -- hl = { fg = '#938056' },
+    provider = function()
+      return require('arrow.statusline').text_for_statusline_with_icons(vim.api.nvim_buf_get_name(0))
+    end,
+  },
+}
+
 local Spell = {
   condition = function()
     return vim.wo.spell
@@ -755,6 +770,7 @@ local DefaultStatusline = {
   Spell,
   WorkDir,
   FileNameBlock,
+  Arrow,
   { provider = '%<' },
   Space,
   Git,

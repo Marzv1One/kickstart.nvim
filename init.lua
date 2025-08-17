@@ -499,6 +499,7 @@ require('lazy').setup({
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
+      'b0o/schemastore.nvim',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -746,6 +747,17 @@ require('lazy').setup({
           },
           enabled = { 'markdown', 'text' },
         },
+        jsonls = {
+          -- cmd = { ... },
+          -- filetypes = { ... },
+          -- capabilities = {},
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
       }
 
       -- Ensure the servers and tools above are installed
@@ -942,27 +954,47 @@ require('lazy').setup({
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'easy-dotnet', 'yank', 'nerdfont', 'emoji' },
         providers = {
+          lsp = {
+            score_offset = 100,
+          },
+          path = {
+            score_offset = 30,
+          },
+          buffer = {
+            score_offset = 30,
+          },
+          snippets = {
+            score_offset = 50,
+          },
           -- snippets = {
           --   opts = {
           --     search_paths = { 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets' },
           --   },
           -- },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
-          nerdfont = {
-            module = 'blink-nerdfont',
-            score_offset = 15,
-            opts = {
-              insert = true,
-            },
-          },
           yank = {
             name = 'yank',
             module = 'blink-yanky',
+            score_offset = 10,
             opts = {
               minLength = 5,
               onlyCurrentFiletype = true,
               trigger_characters = { '"' },
               kind_icon = '󰅍',
+            },
+          },
+          ['easy-dotnet'] = {
+            name = 'easy-dotnet',
+            enabled = true,
+            module = 'easy-dotnet.completion.blink',
+            score_offset = 1000,
+            async = true,
+          },
+          nerdfont = {
+            module = 'blink-nerdfont',
+            score_offset = 15,
+            opts = {
+              insert = true,
             },
           },
           emoji = {
@@ -984,13 +1016,6 @@ require('lazy').setup({
             --     vim.o.filetype
             --   )
             -- end,
-          },
-          ['easy-dotnet'] = {
-            name = 'easy-dotnet',
-            enabled = true,
-            module = 'easy-dotnet.completion.blink',
-            score_offset = 10000,
-            async = true,
           },
         },
       },

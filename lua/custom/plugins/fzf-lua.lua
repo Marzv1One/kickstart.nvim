@@ -9,6 +9,26 @@ return {
         preview = {
           default = 'bat',
         },
+        on_create = function()
+          vim.cmd 'silent !glazewm command wm-toggle-pause'
+        end,
+        on_close = function()
+          vim.cmd 'silent !glazewm command wm-toggle-pause'
+        end,
+      },
+      actions = {
+        files = {
+          ['ctrl-y'] = actions.file_edit_or_qf,
+          ['enter'] = actions.file_edit_or_qf,
+          ['ctrl-s'] = actions.file_split,
+          ['ctrl-v'] = actions.file_vsplit,
+          ['ctrl-t'] = actions.file_tabedit,
+          ['alt-q'] = actions.file_sel_to_qf,
+          ['alt-Q'] = actions.file_sel_to_ll,
+          ['alt-i'] = actions.toggle_ignore,
+          ['alt-h'] = actions.toggle_hidden,
+          ['alt-f'] = actions.toggle_follow,
+        },
       },
       keymap = {
         builtin = {
@@ -18,6 +38,11 @@ return {
         fzf = {
           ['ctrl-d'] = 'preview-page-down',
           ['ctrl-u'] = 'preview-page-up',
+          ['ctrl-f'] = 'half-page-down',
+          ['ctrl-b'] = 'half-page-up',
+          ['alt-a'] = 'toggle-all',
+          ['alt-g'] = 'first',
+          ['alt-G'] = 'last',
         },
       },
       lsp = {
@@ -99,14 +124,6 @@ return {
           ['enter'] = actions.hi,
         },
       },
-      actions = {
-        files = {
-          ['ctrl-y'] = actions.file_edit_or_qf,
-          ['enter'] = actions.file_edit_or_qf,
-          ['ctrl-v'] = actions.file_vsplit,
-          ['alt-q'] = actions.file_sel_to_qf,
-        },
-      },
     },
     config = function(_, opts)
       local fzf = require 'fzf-lua'
@@ -125,6 +142,16 @@ return {
 
       local map = vim.keymap.set
       local fzf = require 'fzf-lua'
+
+      local fullscreen_winopts = {
+        winopts = {
+          fullscreen = true,
+          preview = {
+            layout = 'vertical',
+            vertical = 'up:70%',
+          },
+        },
+      }
 
       map('n', '<leader>fh', fzf.helptags, { desc = 'Help Tags' })
       map('n', '<leader>fk', fzf.keymaps, { desc = 'Keymaps' })
@@ -148,18 +175,23 @@ return {
       map('n', '<leader>fs', fzf.search_history, { desc = 'Search History' })
       map('n', '<leader>fx', fzf.command_history, { desc = 'Command History' })
       map('n', '<leader>fj', fzf.jumps, { desc = 'Jumps' })
-      map('n', '<leader>fy', fzf.registers, { desc = 'Registers' })
+      map('n', '<leader>fp', fzf.registers, { desc = 'Registers' })
       map('n', '<leader>fz', fzf.spell_suggest, { desc = 'Spell Suggest' })
       map('n', '<leader>fW', fzf.grep_cWORD, { desc = 'Grep WORD' })
       map('n', '<leader>fi', fzf.highlights, { desc = 'Highlights' })
+      map('n', '<leader>fe', fzf.grep_quickfix, { desc = 'Grep Quickfix' })
       map('v', '<leader>fw', fzf.grep_visual, { desc = 'Grep Visual' })
 
       -- FzfLua Git keymaps
       map('n', '<leader>gf', fzf.git_files, { desc = 'Git Files' })
       map('n', '<leader>gc', fzf.git_commits, { desc = 'Git Commits' })
       map('n', '<leader>gb', fzf.git_bcommits, { desc = 'Git Buffer Commits' })
-      map('n', '<leader>gs', fzf.git_status, { desc = 'Git Status' })
-      map('n', '<leader>gd', fzf.git_diff, { desc = 'Git Diff' })
+      map('n', '<leader>gs', function()
+        fzf.git_status(fullscreen_winopts)
+      end, { desc = 'Git Status' })
+      map('n', '<leader>gd', function()
+        fzf.git_diff(fullscreen_winopts)
+      end, { desc = 'Git Diff' })
       map('n', '<leader>gh', fzf.git_hunks, { desc = 'Git Hunks' })
       map('n', '<leader>gl', fzf.git_branches, { desc = 'Git Branches' })
       map('n', '<leader>gt', fzf.git_stash, { desc = 'Git Stash' })

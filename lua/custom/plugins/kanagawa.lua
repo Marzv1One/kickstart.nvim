@@ -12,9 +12,9 @@ return {
       colors = {
         theme = {
           dragon = {
-            ui = {
-              fg = '#DCD7BA',
-            },
+            -- ui = {
+            --   fg = '#DCD7BA',
+            -- },
             syn = {
               special3 = '#FF5D62',
               regex = '#C0A36E',
@@ -159,9 +159,10 @@ return {
           Folded = {
             bg = c(theme.ui.bg_m1):blend(theme.ui.bg_p1, 0.35):to_hex(),
           },
+          -- FoldColumn = { link = 'LineNr' },
           FoldColumn = {
             -- bg = 'none',
-            fg = theme.ui.special,
+            fg = '#54546d',
             bold = true,
           },
 

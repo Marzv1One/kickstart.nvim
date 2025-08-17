@@ -18,6 +18,7 @@ local function copy_to_clipboard(selected)
   else
     vim.notify('Failed to copy password: ' .. password_entry, vim.log.levels.ERROR)
   end
+  vim.cmd 'silent !glazewm command wm-toggle-pause'
 end
 
 -- Configure fzf-lua with gopass entries and custom actions
@@ -33,9 +34,13 @@ vim.api.nvim_create_user_command('Gopass', function()
       height = 0.5,
       row = 0.3,
       col = 0.5,
+      on_create = function()
+        vim.cmd 'silent !glazewm command wm-toggle-pause'
+      end,
+      on_close = function() end,
     },
   })
 end, {})
 
 -- Add keybinding for gopass command
-vim.keymap.set('n', '<leader>P', '<cmd>Gopass<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>pm', '<cmd>Gopass<CR>', { noremap = true, silent = true })

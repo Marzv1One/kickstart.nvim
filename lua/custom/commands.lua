@@ -198,3 +198,23 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
     vim.keymap.set('n', 'q', '<C-w>q', { buffer = args.buf })
   end,
 })
+
+-- Define function to wipe out all terminal buffers
+local function wipe_terminal_buffers()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_get_option(buf, 'filetype') == 'terminal' then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end
+  end
+end
+
+-- Set autocmd to run before Neovim exits
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  desc = 'Wipe out all terminal buffers before exit',
+  callback = wipe_terminal_buffers,
+})
+
+-- local buf_name = vim.api.nvim_buf_get_name(buf)
+-- if vim.api.nvim_buf_get_option(buf, 'filetype') == 'terminal' and buf_name:match('^term://') then
+--   pcall(vim.api.nvim_buf_delete, buf, { force = true })
+-- end
