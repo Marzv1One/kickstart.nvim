@@ -1,8 +1,3 @@
--- This file is subject to LGPL-2.1 and installed from:
--- https://github.com/f-person/lua-timeago
---
--- TODO: Understand lua require weirdness and properly include this as a git submodule
-
 local language = {
   justnow = 'just now',
   minute = { singular = 'a minute ago', plural = 'minutes ago' },

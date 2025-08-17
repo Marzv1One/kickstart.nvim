@@ -199,6 +199,15 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
   end,
 })
 
+-- Filetype-specific keymaps
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'dashboard',
+  callback = function()
+    vim.keymap.set('n', '.', '<cmd>SessionLoad<CR>', { buffer = true, silent = true })
+    vim.keymap.set('n', 'e', '<cmd>Oil .<CR>', { buffer = true, silent = true })
+  end,
+})
+
 -- Define function to wipe out all terminal buffers
 local function wipe_terminal_buffers()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -214,7 +223,6 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
   callback = wipe_terminal_buffers,
 })
 
--- local buf_name = vim.api.nvim_buf_get_name(buf)
--- if vim.api.nvim_buf_get_option(buf, 'filetype') == 'terminal' and buf_name:match('^term://') then
---   pcall(vim.api.nvim_buf_delete, buf, { force = true })
--- end
+vim.api.nvim_create_user_command('UndotreeCleanCache', function()
+  require('undotree_cache').cleanup()
+end, {})

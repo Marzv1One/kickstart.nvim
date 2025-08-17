@@ -30,24 +30,16 @@ map('n', '{', '{zz', { desc = 'Through empty lines' })
 map('n', '}', '}zz', { desc = 'Through empty lines' })
 
 -- Spawn commands in Wezterm
-map('n', '<leader>Tc', '<cmd>SpawnCrush<CR>', { desc = 'Spawn Crush in new Wezterm window' })
-map('n', '<leader>Tg', '<cmd>SpawnLazygit<CR>', { desc = 'Spawn Lazygit in new Wezterm window' })
-map('n', '<leader>Tb', '<cmd>SpawnBat<CR>', { desc = 'Spawn Bat in new Wezterm window' })
-map('n', '<leader>Ts', '<cmd>SpawnSpf<CR>', { desc = 'Spawn Superfile in new Wezterm window' })
-map('n', '<leader>Tm', '<cmd>SpawnGlow<CR>', { desc = 'Spawn Glow in new Wezterm window' })
-map('n', '<leader>Tt', '<cmd>SpawnTerm<CR>', { desc = 'Spawn new Wezterm window' })
-map('n', '<leader>Tp', '<cmd>silent !glazewm command wm-toggle-pause<CR>', { desc = 'Toggle GlazeWM pause', silent = true })
+map('n', '<leader>tc', '<cmd>SpawnCrush<CR>', { desc = 'Spawn Crush in new Wezterm window' })
+map('n', '<leader>tg', '<cmd>SpawnLazygit<CR>', { desc = 'Spawn Lazygit in new Wezterm window' })
+map('n', '<leader>tb', '<cmd>SpawnBat<CR>', { desc = 'Spawn Bat in new Wezterm window' })
+map('n', '<leader>ts', '<cmd>SpawnSpf<CR>', { desc = 'Spawn Superfile in new Wezterm window' })
+map('n', '<leader>tm', '<cmd>SpawnGlow<CR>', { desc = 'Spawn Glow in new Wezterm window' })
+map('n', '<leader>tt', '<cmd>SpawnTerm<CR>', { desc = 'Spawn new Wezterm window' })
+map('n', '<leader>tp', '<cmd>silent !glazewm command wm-toggle-pause<CR>', { desc = 'Toggle GlazeWM pause', silent = true })
 
 -- Gopass integration
 map('n', '<leader>gp', '<cmd>luafile ~/.config/nvim/after/plugin/fzf-lua/gopass.lua<CR>', { desc = 'Gopass menu', silent = true })
-
--- Filetype-specific keymaps
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'dashboard',
-  callback = function()
-    map('n', '.', '<cmd>SessionLoad<CR>', { buffer = true, silent = true })
-  end,
-})
 
 -- Optional: Add visual mode mappings for commands that might work with selections
 -- map('v', '<leader>u', ':UnescapeUnicode<CR>', { desc = 'Unescape Unicode in selection' })

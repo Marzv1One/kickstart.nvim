@@ -346,14 +346,14 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>T', group = '[T]erminal' },
         { '<leader>c', group = '[C]ode' },
         { '<leader>d', group = '[D]iagnostics' },
         { '<leader>f', group = '[F]zf Lua' },
         { '<leader>g', group = '[G]it' },
         { '<leader>r', group = '[R]ename' },
         -- { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t', group = '[T]erminal' },
+        { '<leader>m', group = '[T]oggle xd' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
@@ -652,7 +652,7 @@ require('lazy').setup({
           --
           -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map('<leader>th', function()
+            map('<leader>mh', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
           end
@@ -1100,7 +1100,12 @@ require('lazy').setup({
       }
 
       require('mini.bracketed').setup()
-      require('mini.move').setup()
+      require('mini.move').setup {
+        mappings = {
+          line_down = '<M-g>',
+          line_up = '<M-b>',
+        },
+      }
       require('mini.bufremove').setup()
 
       --  You could remove this setup call if you don't like it,
