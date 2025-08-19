@@ -226,3 +226,52 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
 vim.api.nvim_create_user_command('UndotreeCleanCache', function()
   require('undotree_cache').cleanup()
 end, {})
+
+-- vim.api.nvim_create_autocmd('CursorMoved', {
+--   group = vim.api.nvim_create_augroup('ScrolloffInfo', { clear = true }),
+--   callback = function()
+--     local scrolloff = vim.o.scrolloff
+--     local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+--     local buf_line_count = vim.api.nvim_buf_line_count(0)
+--
+--     local topline = vim.fn.line 'w0'
+--     local bottomline = vim.fn.line 'w$'
+--
+--     -- H (High): top of screen + scrolloff (unless at top of file)
+--     local H_line
+--     if topline == 1 then
+--       H_line = 1
+--     else
+--       H_line = math.min(bottomline, topline + scrolloff)
+--     end
+--
+--     -- M (Middle): actual screen middle (no edge case needed)
+--     local M_line = math.floor((topline + bottomline) / 2)
+--
+--     -- L (Low): bottom of screen - scrolloff (unless at bottom of file)
+--     local L_line
+--     if bottomline == buf_line_count then
+--       L_line = buf_line_count
+--     else
+--       L_line = math.max(topline, bottomline - scrolloff)
+--     end
+--
+--     -- Compute relative numbers
+--     local rel_H = H_line - cursor_line
+--     local rel_M = M_line - cursor_line
+--     local rel_L = L_line - cursor_line
+--
+--     -- Echo nicely
+--     vim.api.nvim_echo({
+--       { string.format('%d', bottomline), 'Normal' },
+--       { ' | ', 'Normal' },
+--       { string.format('%d', cursor_line), 'Normal' },
+--       { ' | ', 'Normal' },
+--       { string.format('H: %d (%+d)', H_line, rel_H), 'Normal' },
+--       { ' | ', 'Normal' },
+--       { string.format('M: %d (%+d)', M_line, rel_M), 'Normal' },
+--       { ' | ', 'Normal' },
+--       { string.format('L: %d (%+d)', L_line, rel_L), 'Normal' },
+--     }, false, {})
+--   end,
+-- })

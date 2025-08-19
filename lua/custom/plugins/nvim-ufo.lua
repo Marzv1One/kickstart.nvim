@@ -1,3 +1,63 @@
+local my_function = function(args)
+  local scrolloff = vim.o.scrolloff
+  -- local win_height = vim.api.nvim_win_get_height(0)
+  -- local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+  local lnum = args.lnum
+  local buf_line_count = vim.api.nvim_buf_line_count(0)
+
+  local topline = vim.fn.line 'w0'
+  local bottomline = vim.fn.line 'w$'
+
+  -- local H_line = math.min(bottomline, topline + scrolloff)
+  -- local M_line = math.floor((topline + bottomline) / 2)
+  -- local L_line = math.max(topline, bottomline - scrolloff)
+
+  -- H (High): top of screen + scrolloff (unless at top of file)
+  local H_line
+  if topline == 1 then
+    H_line = 1
+  else
+    H_line = math.min(bottomline, topline + scrolloff)
+  end
+
+  -- M (Middle): actual screen middle (no edge case needed)
+  local M_line = math.floor((topline + bottomline) / 2)
+
+  -- L (Low): bottom of screen - scrolloff (unless at bottom of file)
+  local L_line
+  if bottomline == buf_line_count then
+    L_line = buf_line_count
+  else
+    L_line = math.max(topline, bottomline - scrolloff)
+  end
+
+  -- Compute relative numbers
+  local rel_H = H_line - lnum
+  local rel_M = M_line - lnum
+  local rel_L = L_line - lnum
+
+  return L_line == lnum or H_line == lnum or M_line == lnum
+
+  -- return (H_line + math.abs(rel_H) == L_line)
+
+  -- return (H_line + math.abs(rel_H) == L_line) and rel_L ~= 0
+
+  -- return (cursor_line ~= topline and math.abs(rel_H) + math.abs(rel_M) == 3 * scrolloff)
+
+  -- return (rel_H == 0 and math.abs(rel_H) + math.abs(rel_M) == 20) or (rel_L == 0 and math.abs(rel_M) + math.abs(rel_L) == 20)
+end
+
+local function get_character(args)
+  -- vim.notify(vim.inspect(args), vim.log.levels.INFO)
+  local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+  if args.lnum ~= cursor_line then
+    return '  ┃'
+  else
+    return require('statuscol.builtin').lnumfunc(args)
+  end
+  -- return '  ┃'
+end
+
 return {
   {
     'kevinhwang91/nvim-ufo',
@@ -22,8 +82,21 @@ return {
               { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
               {
                 text = { builtin.lnumfunc, ' ' },
-                condition = { true, builtin.not_empty },
+                condition = {
+                  function(args)
+                    return not my_function(args)
+                  end,
+                },
+                -- condition = { true, builtin.not_empty },
                 click = 'v:lua.ScLa',
+              },
+              {
+                text = { get_character, ' ' },
+                -- text = { '  ┃', ' ' },
+                condition = {
+                  my_function,
+                },
+                hl = 'Number',
               },
             },
           }

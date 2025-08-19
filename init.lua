@@ -213,13 +213,13 @@ vim.keymap.set('n', '<C-S-k>', '<C-w>K', { desc = 'Move window to the upper' })
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.hl.on_yank()`
-vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.hl.on_yank()
-  end,
-})
+-- vim.api.nvim_create_autocmd('TextYankPost', {
+--   desc = 'Highlight when yanking (copying) text',
+--   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+--   callback = function()
+--     vim.hl.on_yank()
+--   end,
+-- })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -387,7 +387,34 @@ require('lazy').setup({
       -- { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      {
+        'nvim-tree/nvim-web-devicons',
+        enabled = vim.g.have_nerd_font,
+        opts = {
+          override_by_filename = {
+            -- ['.gitignore'] = {
+            --   icon = '',
+            --   color = '#f1502f',
+            --   name = 'GitIgnore',
+            -- },
+            ['init.lua'] = {
+              icon = '',
+              name = 'InitLua',
+              color = '#50fa7b',
+            },
+            ['.crush.json'] = {
+              icon = '',
+              name = 'CrushJson',
+              color = '#ff00ff',
+            },
+            ['crush.json'] = {
+              icon = '',
+              name = 'CrushJson',
+              color = '#ff00ff',
+            },
+          },
+        },
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -553,7 +580,18 @@ require('lazy').setup({
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           -- map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-          map('gra', fzf.lsp_code_actions, '[G]oto Code [A]ction', { 'n', 'x' })
+          map('gra', function()
+            fzf.lsp_code_actions {
+              winopts = {
+                fullscreen = true,
+                ---@diagnostic disable-next-line: missing-fields
+                preview = {
+                  layout = 'vertical',
+                  vertical = 'up:70%',
+                },
+              },
+            }
+          end, '[G]oto Code [A]ction', { 'n', 'x' })
 
           -- Find references for the word under your cursor.
           -- map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')

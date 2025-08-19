@@ -8,6 +8,10 @@ return {
     },
     opts = {
       ring = { storage = 'sqlite' },
+      highlight = {
+        on_put = true,
+        on_yank = true,
+      },
     },
     keys = {
       -- { '<leader>p', '<cmd>YankyRingHistory<cr>', mode = { 'n', 'x' }, desc = 'Open Yank History' },
@@ -45,10 +49,15 @@ return {
 
       local map = vim.keymap.set
 
-      map('n', 's', require('substitute').operator, { desc = 'Substitute' })
-      map('n', 'ss', require('substitute').line, { desc = 'Substitute Line' })
-      map('n', 'S', require('substitute').eol, { desc = 'Substitute EOL' })
-      map('x', 's', require('substitute').visual, { desc = 'Substitute Visual' })
+      map('n', 's', require('substitute').operator, { noremap = true, desc = 'Substitute' })
+      map('n', 'ss', require('substitute').line, { noremap = true, desc = 'Substitute Line' })
+      map('n', 'S', require('substitute').eol, { noremap = true, desc = 'Substitute EOL' })
+      map('x', 's', require('substitute').visual, { noremap = true, desc = 'Substitute Visual' })
+
+      map('n', 'gl', require('substitute.exchange').operator, { noremap = true, desc = 'Substitute Exchange' })
+      map('n', 'gll', require('substitute.exchange').line, { noremap = true, desc = 'Substitute Exchange Line' })
+      map('x', 'gL', require('substitute.exchange').visual, { noremap = true, desc = 'Substitute Exchange Visual' })
+      map('n', 'glc', require('substitute.exchange').cancel, { noremap = true, desc = 'Substitute Exchange Cancel' })
     end,
   },
   {

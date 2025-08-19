@@ -124,6 +124,14 @@ return {
           ['enter'] = actions.hi,
         },
       },
+      git = {
+        status = {
+          actions = {
+            ['ctrl-l'] = { fn = actions.git_unstage, reload = true },
+            ['ctrl-h'] = { fn = actions.git_stage, reload = true },
+          },
+        },
+      },
     },
     config = function(_, opts)
       local fzf = require 'fzf-lua'

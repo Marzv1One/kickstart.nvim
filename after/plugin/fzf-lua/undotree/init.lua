@@ -208,4 +208,4 @@ function M.open()
 end
 
 vim.api.nvim_create_user_command('Undotree', M.open, { nargs = 0 })
-vim.keymap.set('n', '<leader>u', '<cmd>Undotree<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>fu', '<cmd>Undotree<CR>', { noremap = true, silent = true })
