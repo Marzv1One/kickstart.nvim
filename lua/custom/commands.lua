@@ -1,55 +1,48 @@
 -- Unescape Unicode
 vim.api.nvim_create_user_command('UnescapeUnicode', function()
-  -- Match \uXXXX, \u{XXXX}, and \uXX formats
+  -- Match \\uXXXX, \\u{XXXX}, and \\uXX formats
   vim.cmd "%s/\\\\u\\({[0-9a-fA-F]\\+}\\|\\([0-9a-fA-F]\\{4\\}\\|[0-9a-fA-F]\\{2\\}\\)\\)/\\=nr2char('0x' . substitute(submatch(1), '{\\|}', '', 'g'))/g"
 end, {})
 
--- Spawn Crush in new Wezterm window
+-- Shared helper: spawn a WezTerm pane and send text, newline at end
+local function wezterm_spawn_and_send(cmd_text, existing_pane_id)
+  -- Always append an exit to ensure the spawned pane closes after execution
+  local to_send = cmd_text
+  if not to_send:match(";exit%s*$") then
+    to_send = to_send .. ";exit"
+  end
+  if existing_pane_id and existing_pane_id ~= '' then
+    vim.system({
+      'wezterm', 'cli', 'send-text',
+      '--pane-id', existing_pane_id,
+      to_send .. "\n",
+    }, { text = true })
+  else
+    vim.system({
+      'wezterm', 'cli', 'spawn',
+      '--new-window',
+      '--cwd', '.',
+    }, { text = true }, function(spawn_res)
+      local pane_id = vim.trim(spawn_res.stdout)
+      if pane_id ~= '' then
+        vim.system({
+          'wezterm', 'cli', 'send-text',
+          '--pane-id', pane_id,
+          to_send .. "\n",
+        }, { text = true })
+      end
+    end)
+  end
+end
+
+-- Spawn Crush in new WezTerm window
 vim.api.nvim_create_user_command('SpawnCrush', function()
-  vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
-    '--new-window',
-    '--cwd',
-    '.',
-  }, { text = true }, function(spawn_res)
-    local pane_id = vim.trim(spawn_res.stdout)
-    if pane_id ~= '' then
-      vim.system({
-        'wezterm',
-        'cli',
-        'send-text',
-        '--pane-id',
-        pane_id,
-        'crush;exit\n',
-      }, { text = true })
-    end
-  end)
+  wezterm_spawn_and_send('crush')
 end, {})
 
--- Spawn Lazygit in new Wezterm window
+-- Spawn Lazygit in new WezTerm window
 vim.api.nvim_create_user_command('SpawnLazygit', function()
-  vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
-    '--new-window',
-    '--cwd',
-    '.',
-  }, { text = true }, function(spawn_res)
-    local pane_id = vim.trim(spawn_res.stdout)
-    if pane_id ~= '' then
-      vim.system({
-        'wezterm',
-        'cli',
-        'send-text',
-        '--pane-id',
-        pane_id,
-        'lazygit;exit\n',
-      }, { text = true })
-    end
-  end)
+  wezterm_spawn_and_send('lazygit')
 end, {})
 
 -- Spawn `bat` for a file in new Wezterm window
@@ -63,26 +56,7 @@ vim.api.nvim_create_user_command('SpawnBat', function(opts)
     return
   end
 
-  vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
-    '--new-window',
-    '--cwd',
-    '.',
-  }, { text = true }, function(spawn_res)
-    local pane_id = vim.trim(spawn_res.stdout)
-    if pane_id ~= '' then
-      vim.system({
-        'wezterm',
-        'cli',
-        'send-text',
-        '--pane-id',
-        pane_id,
-        'bat --paging=always ' .. filepath .. ';exit\n',
-      }, { text = true })
-    end
-  end)
+  wezterm_spawn_and_send('bat --paging=always ' .. vim.fn.shellescape(filepath))
 end, { nargs = '?' })
 
 -- Spawn Superfile (spf) in new Wezterm window
@@ -91,70 +65,77 @@ end, { nargs = '?' })
 --   :SpawnSpf ~/projects  -> Runs 'spf ~/projects'
 vim.api.nvim_create_user_command('SpawnSpf', function(opts)
   local target = opts.args ~= '' and 'spf ' .. opts.args or 'spf'
-
-  vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
-    '--new-window',
-    '--cwd',
-    '.',
-  }, { text = true }, function(spawn_res)
-    local pane_id = vim.trim(spawn_res.stdout)
-    if pane_id ~= '' then
-      vim.system({
-        'wezterm',
-        'cli',
-        'send-text',
-        '--pane-id',
-        pane_id,
-        target .. ';exit\n',
-      }, { text = true })
-    end
-  end)
+  wezterm_spawn_and_send(target .. ';exit')
 end, { nargs = '?' })
 
--- Spawn `glow` for a file in new Wezterm window
+-- Spawn `glow` for a file in new WezTerm window
 -- Usage:
 --   :SpawnGlow             -> Runs 'glow --line-numbers --tui' in root Git directory
 --   :SpawnGlow ~/file.md   -> Runs 'glow --line-numbers --tui' on ~/file.md
+local glow_pane_id = nil
+local glow_has_window = false
+
+local function _lua_shellescape(s)
+  if s == nil or s == '' then return "''" end
+  return "'" .. tostring(s):gsub("'", "'\\''") .. "'"
+end
+
+-- Helper to check if a given WezTerm pane_id is alive
+local function check_pane_alive(pane_id, cb)
+  if not pane_id or pane_id == '' then cb(false) return end
+  vim.system({'wezterm','cli','list'}, { text = true }, function(res)
+    if res.code == 0 and res.stdout and res.stdout:find('%f[%d]' .. pane_id .. '%f[%D]') then
+      cb(true)
+    else
+      cb(false)
+    end
+  end)
+end
+
 vim.api.nvim_create_user_command('SpawnGlow', function(opts)
   local filepath = opts.args ~= '' and opts.args or ''
   local git_root = vim.trim(vim.fn.system { 'git', 'rev-parse', '--show-toplevel' })
   local cwd = vim.v.shell_error == 0 and git_root or '.'
 
-  vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
-    '--new-window',
-    '--cwd',
-    cwd,
-  }, { text = true }, function(spawn_res)
-    local pane_id = vim.trim(spawn_res.stdout)
-    if pane_id ~= '' then
-      local cmd = filepath ~= '' and 'glow --line-numbers --tui ' .. filepath or 'glow --line-numbers --tui'
-      vim.system({
-        'wezterm',
-        'cli',
-        'send-text',
-        '--pane-id',
-        pane_id,
-        cmd .. ';exit\n',
-      }, { text = true })
-    end
-  end)
+  local function spawn_new()
+    vim.system({'wezterm','cli','spawn','--new-window','--cwd', cwd}, {text=true}, function(spawn_res)
+      local pane_id = vim.trim(spawn_res.stdout)
+      if pane_id ~= '' then
+        glow_pane_id = pane_id
+        glow_has_window = true
+        local cmd = filepath ~= '' and ('glow --line-numbers --tui ' .. _lua_shellescape(filepath)) or 'glow --line-numbers --tui'
+        wezterm_spawn_and_send(cmd, pane_id)
+      else
+        glow_pane_id = nil
+        glow_has_window = false
+        vim.notify("Failed to spawn new Glow window", vim.log.levels.ERROR)
+      end
+    end)
+  end
+
+  if glow_has_window and glow_pane_id and glow_pane_id ~= '' then
+    check_pane_alive(glow_pane_id, function(alive)
+      if alive then
+        local cmd = filepath ~= '' and ('glow --line-numbers --tui ' .. _lua_shellescape(filepath)) or 'glow --line-numbers --tui'
+        wezterm_spawn_and_send(cmd, glow_pane_id)
+      else
+        glow_pane_id = nil
+        glow_has_window = false
+        vim.notify("Glow pane was closed. Re-spawning.", vim.log.levels.INFO)
+        spawn_new()
+      end
+    end)
+  else
+    spawn_new()
+  end
 end, { nargs = '?' })
 
 -- Spawn a new Wezterm window with no command
 vim.api.nvim_create_user_command('SpawnTerm', function()
   vim.system({
-    'wezterm',
-    'cli',
-    'spawn',
+    'wezterm', 'cli', 'spawn',
     '--new-window',
-    '--cwd',
-    '.',
+    '--cwd', '.',
   }, { text = true })
 end, {})
 
@@ -226,52 +207,3 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
 vim.api.nvim_create_user_command('UndotreeCleanCache', function()
   require('undotree_cache').cleanup()
 end, {})
-
--- vim.api.nvim_create_autocmd('CursorMoved', {
---   group = vim.api.nvim_create_augroup('ScrolloffInfo', { clear = true }),
---   callback = function()
---     local scrolloff = vim.o.scrolloff
---     local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
---     local buf_line_count = vim.api.nvim_buf_line_count(0)
---
---     local topline = vim.fn.line 'w0'
---     local bottomline = vim.fn.line 'w$'
---
---     -- H (High): top of screen + scrolloff (unless at top of file)
---     local H_line
---     if topline == 1 then
---       H_line = 1
---     else
---       H_line = math.min(bottomline, topline + scrolloff)
---     end
---
---     -- M (Middle): actual screen middle (no edge case needed)
---     local M_line = math.floor((topline + bottomline) / 2)
---
---     -- L (Low): bottom of screen - scrolloff (unless at bottom of file)
---     local L_line
---     if bottomline == buf_line_count then
---       L_line = buf_line_count
---     else
---       L_line = math.max(topline, bottomline - scrolloff)
---     end
---
---     -- Compute relative numbers
---     local rel_H = H_line - cursor_line
---     local rel_M = M_line - cursor_line
---     local rel_L = L_line - cursor_line
---
---     -- Echo nicely
---     vim.api.nvim_echo({
---       { string.format('%d', bottomline), 'Normal' },
---       { ' | ', 'Normal' },
---       { string.format('%d', cursor_line), 'Normal' },
---       { ' | ', 'Normal' },
---       { string.format('H: %d (%+d)', H_line, rel_H), 'Normal' },
---       { ' | ', 'Normal' },
---       { string.format('M: %d (%+d)', M_line, rel_M), 'Normal' },
---       { ' | ', 'Normal' },
---       { string.format('L: %d (%+d)', L_line, rel_L), 'Normal' },
---     }, false, {})
---   end,
--- })
