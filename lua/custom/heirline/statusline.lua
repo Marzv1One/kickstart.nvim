@@ -550,17 +550,17 @@ local WorkDir = {
   },
 }
 
-local CodeiumStatus = {
-  condition = function()
-    return not conditions.buffer_matches {
-      filetype = { 'dashboard' },
-    }
-  end,
-  hl = { fg = 'cyan' },
-  provider = function()
-    return '󰚩 ' .. vim.fn['codeium#GetStatusString']()
-  end,
-}
+-- local CodeiumStatus = {
+--   condition = function()
+--     return not conditions.buffer_matches {
+--       filetype = { 'dashboard' },
+--     }
+--   end,
+--   hl = { fg = 'cyan' },
+--   provider = function()
+--     return '󰚩 ' .. vim.fn['codeium#GetStatusString']()
+--   end,
+-- }
 
 local DRLSPStatus = {
   condition = conditions.lsp_attached(),
@@ -691,9 +691,40 @@ local SearchCount = {
   end,
   provider = function(self)
     local search = self.search
-    return string.format(' %d/%d', search.current, math.min(search.total, search.maxcount))
+    if search then
+      return string.format(' %d/%d', search.current, math.min(search.total, search.maxcount))
+    else
+      return ''
+    end
   end,
   hl = { fg = 'purple', bold = true },
+}
+
+local MacroComp = {
+  provider = function(self)
+    local comp = ''
+    if string.find(vim.inspect(self.status), 'Delay') then
+      comp = '  ' .. comp
+    end
+    if string.find(vim.inspect(self.status), 'Recording') then
+      comp = '  ' .. comp
+    end
+    if string.find(vim.inspect(self.status), 'Playing') then
+      comp = '  ' .. comp
+    end
+    return comp
+  end,
+  update = {
+    'User',
+    pattern = {
+      'NeoComposerRecordingSet',
+      'NeoComposerPlayingSet',
+      'NeoComposerDelaySet',
+    },
+    callback = function(self)
+      self.status = require('NeoComposer.ui').status_recording()
+    end,
+  },
 }
 
 local MacroRec = {
@@ -736,6 +767,13 @@ local ShowCmd = {
   end,
 }
 
+local MatchParen = {
+  provider = function()
+    return vim.fn['MatchupStatusOffscreen']()
+  end,
+  -- hl = { link = 'MatchParen' },
+}
+
 -- local VirtualEnv = {
 --     init = function(self)
 --         if not self.timer then
@@ -758,10 +796,12 @@ local Align = { provider = '%=' }
 local Space = { provider = ' ' }
 
 ViMode = utils.surround({ separators.rounded_left, separators.rounded_right }, 'bright_bg', {
-  MacroRec,
+  -- MacroRec,
+  MacroComp,
   ViMode,
   Snippets,
   ShowCmd,
+  MatchParen,
 })
 
 local DefaultStatusline = {
@@ -777,7 +817,7 @@ local DefaultStatusline = {
   Space,
   Diagnostics,
   Space,
-  CodeiumStatus,
+  -- CodeiumStatus,
   Align,
   -- { flexible = 3,   { Navic, Space }, { provider = "" } },
   -- Align,

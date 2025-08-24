@@ -4,6 +4,9 @@ return {
     init = function()
       -- modify your configuration vars here
       vim.g.matchup_treesitter_stopline = 1000
+      vim.g.matchup_matchparen_offscreen = {
+        method = 'popup' --[[ method = 'status_manual' ]],
+      }
 
       -- or call the setup function provided as a helper. It defines the
       -- configuration vars for you

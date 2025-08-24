@@ -16,6 +16,10 @@ return {
   {
     'karb94/neoscroll.nvim',
     enabled = true,
-    opts = {},
+    opts = {
+      post_hook = function()
+        -- vim.cmd 'redrawstatus'
+      end,
+    },
   },
 }

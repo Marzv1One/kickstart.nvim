@@ -22,7 +22,7 @@
 - [x] smooth cursor
 - [x] inc-rename
 - [x] transparent
-- [ ] dashboard
+- [x] dashboard
 - [ ] hardtime
 - [ ] WezTerm plugins
 - [ ] neo composer
@@ -38,13 +38,13 @@
 - [x] set pwsh as Neovim terminal
 - [x] Fzf for gopass
 - [x] Debugger for dotnet
-- [ ] Fzf for yanky
-- [ ] Fzf for persisted
-- [ ] Fzf for undotree
-- [ ] Kanagawa <3
+- [x] Fzf for yanky
+- [x] Fzf for persisted
+- [x] Fzf for undotree
+- [x] Kanagawa <3
 - [x] sleek
 - [x] xmllint
-- [ ] down arrow nvim-ufo
+- [x] down arrow nvim-ufo
 - [x] emoji blink-cmp
 - [ ] FZF Lua git + toggleterm
 - [ ] JSON LSP

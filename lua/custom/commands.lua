@@ -5,30 +5,34 @@ vim.api.nvim_create_user_command('UnescapeUnicode', function()
 end, {})
 
 -- Shared helper: spawn a WezTerm pane and send text, newline at end
-local function wezterm_spawn_and_send(cmd_text, existing_pane_id)
-  -- Always append an exit to ensure the spawned pane closes after execution
+local function wezterm_spawn_and_send(cmd_text, existing_pane_id, opts)
+  opts = opts or {}
+  local spawn_mode = opts.spawn_mode or 'window' -- 'window' (default) or 'tab'
   local to_send = cmd_text
-  if not to_send:match(";exit%s*$") then
-    to_send = to_send .. ";exit"
-  end
   if existing_pane_id and existing_pane_id ~= '' then
     vim.system({
-      'wezterm', 'cli', 'send-text',
-      '--pane-id', existing_pane_id,
-      to_send .. "\n",
+      'wezterm',
+      'cli',
+      'send-text',
+      '--pane-id',
+      existing_pane_id,
+      to_send .. '\n',
     }, { text = true })
   else
-    vim.system({
-      'wezterm', 'cli', 'spawn',
-      '--new-window',
-      '--cwd', '.',
-    }, { text = true }, function(spawn_res)
+    local spawn_args = { 'wezterm', 'cli', 'spawn', '--cwd', '.' }
+    if spawn_mode == 'window' then
+      table.insert(spawn_args, 4, '--new-window')
+    end
+    vim.system(spawn_args, { text = true }, function(spawn_res)
       local pane_id = vim.trim(spawn_res.stdout)
       if pane_id ~= '' then
         vim.system({
-          'wezterm', 'cli', 'send-text',
-          '--pane-id', pane_id,
-          to_send .. "\n",
+          'wezterm',
+          'cli',
+          'send-text',
+          '--pane-id',
+          pane_id,
+          to_send .. '\n',
         }, { text = true })
       end
     end)
@@ -36,27 +40,33 @@ local function wezterm_spawn_and_send(cmd_text, existing_pane_id)
 end
 
 -- Spawn Crush in new WezTerm window
-vim.api.nvim_create_user_command('SpawnCrush', function()
-  wezterm_spawn_and_send('crush')
-end, {})
+vim.api.nvim_create_user_command('SpawnCrush', function(opts)
+  local spawn_mode = (opts.args or '') == 'tab' and 'tab' or 'window'
+  wezterm_spawn_and_send('crush;exit', nil, { spawn_mode = spawn_mode })
+end, { nargs = '?' })
 
 -- Spawn Lazygit in new WezTerm window
-vim.api.nvim_create_user_command('SpawnLazygit', function()
-  wezterm_spawn_and_send('lazygit')
-end, {})
+vim.api.nvim_create_user_command('SpawnLazygit', function(opts)
+  local spawn_mode = (opts.args or '') == 'tab' and 'tab' or 'window'
+  wezterm_spawn_and_send('lazygit;exit', nil, { spawn_mode = spawn_mode })
+end, { nargs = '?' })
 
 -- Spawn `bat` for a file in new Wezterm window
 -- Usage:
 --   :SpawnBat             -> Runs 'bat' on current file
 --   :SpawnBat ~/file.txt  -> Runs 'bat' on ~/file.txt
 vim.api.nvim_create_user_command('SpawnBat', function(opts)
-  local filepath = opts.args ~= '' and opts.args or vim.fn.expand '%:p'
+  local args = vim.split(opts.args or '', ' +')
+  local mode = #args > 0 and args[#args] == 'tab' and 'tab' or 'window'
+  if mode == 'tab' then
+    table.remove(args, #args)
+  end
+  local filepath = #args > 0 and table.concat(args, ' ') or vim.fn.expand '%:p'
   if filepath == '' then
     vim.notify('No file specified or in buffer', vim.log.levels.WARN)
     return
   end
-
-  wezterm_spawn_and_send('bat --paging=always ' .. vim.fn.shellescape(filepath))
+  wezterm_spawn_and_send('bat --paging=always ' .. vim.fn.shellescape(filepath) .. ';exit', nil, { spawn_mode = mode })
 end, { nargs = '?' })
 
 -- Spawn Superfile (spf) in new Wezterm window
@@ -64,8 +74,14 @@ end, { nargs = '?' })
 --   :SpawnSpf             -> Runs 'spf' in current directory
 --   :SpawnSpf ~/projects  -> Runs 'spf ~/projects'
 vim.api.nvim_create_user_command('SpawnSpf', function(opts)
-  local target = opts.args ~= '' and 'spf ' .. opts.args or 'spf'
-  wezterm_spawn_and_send(target .. ';exit')
+  local args = vim.split(opts.args or '', ' +')
+  local mode = #args > 0 and args[#args] == 'tab' and 'tab' or 'window'
+  if mode == 'tab' then
+    table.remove(args, #args)
+  end
+  local rest = #args > 0 and table.concat(args, ' ') or ''
+  local target = rest == '' and 'spf;exit' or 'spf ' .. rest .. ';exit'
+  wezterm_spawn_and_send(target, nil, { spawn_mode = mode })
 end, { nargs = '?' })
 
 -- Spawn `glow` for a file in new WezTerm window
@@ -76,14 +92,19 @@ local glow_pane_id = nil
 local glow_has_window = false
 
 local function _lua_shellescape(s)
-  if s == nil or s == '' then return "''" end
+  if s == nil or s == '' then
+    return "''"
+  end
   return "'" .. tostring(s):gsub("'", "'\\''") .. "'"
 end
 
 -- Helper to check if a given WezTerm pane_id is alive
 local function check_pane_alive(pane_id, cb)
-  if not pane_id or pane_id == '' then cb(false) return end
-  vim.system({'wezterm','cli','list'}, { text = true }, function(res)
+  if not pane_id or pane_id == '' then
+    cb(false)
+    return
+  end
+  vim.system({ 'wezterm', 'cli', 'list' }, { text = true }, function(res)
     if res.code == 0 and res.stdout and res.stdout:find('%f[%d]' .. pane_id .. '%f[%D]') then
       cb(true)
     else
@@ -93,12 +114,21 @@ local function check_pane_alive(pane_id, cb)
 end
 
 vim.api.nvim_create_user_command('SpawnGlow', function(opts)
-  local filepath = opts.args ~= '' and opts.args or ''
+  local args = vim.split(opts.args or '', ' +')
+  local mode = #args > 0 and args[#args] == 'tab' and 'tab' or 'window'
+  if mode == 'tab' then
+    table.remove(args, #args)
+  end
+  local filepath = #args > 0 and table.concat(args, ' ') or ''
   local git_root = vim.trim(vim.fn.system { 'git', 'rev-parse', '--show-toplevel' })
   local cwd = vim.v.shell_error == 0 and git_root or '.'
 
   local function spawn_new()
-    vim.system({'wezterm','cli','spawn','--new-window','--cwd', cwd}, {text=true}, function(spawn_res)
+    local spawn_args = { 'wezterm', 'cli', 'spawn', '--cwd', cwd }
+    if mode == 'window' then
+      table.insert(spawn_args, 4, '--new-window')
+    end
+    vim.system(spawn_args, { text = true }, function(spawn_res)
       local pane_id = vim.trim(spawn_res.stdout)
       if pane_id ~= '' then
         glow_pane_id = pane_id
@@ -108,7 +138,7 @@ vim.api.nvim_create_user_command('SpawnGlow', function(opts)
       else
         glow_pane_id = nil
         glow_has_window = false
-        vim.notify("Failed to spawn new Glow window", vim.log.levels.ERROR)
+        vim.notify('Failed to spawn new Glow pane', vim.log.levels.ERROR)
       end
     end)
   end
@@ -121,23 +151,26 @@ vim.api.nvim_create_user_command('SpawnGlow', function(opts)
       else
         glow_pane_id = nil
         glow_has_window = false
-        vim.notify("Glow pane was closed. Re-spawning.", vim.log.levels.INFO)
+        vim.notify('Glow pane was closed. Spawning new one.', vim.log.levels.INFO)
         spawn_new()
       end
     end)
   else
+    glow_pane_id = nil
+    glow_has_window = false
     spawn_new()
   end
 end, { nargs = '?' })
 
--- Spawn a new Wezterm window with no command
-vim.api.nvim_create_user_command('SpawnTerm', function()
-  vim.system({
-    'wezterm', 'cli', 'spawn',
-    '--new-window',
-    '--cwd', '.',
-  }, { text = true })
-end, {})
+-- Spawn a new Wezterm window or tab with no command
+vim.api.nvim_create_user_command('SpawnTerm', function(opts)
+  local spawn_mode = (opts.args or '') == 'tab' and 'tab' or 'window'
+  local spawn_args = { 'wezterm', 'cli', 'spawn', '--cwd', '.' }
+  if spawn_mode == 'window' then
+    table.insert(spawn_args, 4, '--new-window')
+  end
+  vim.system(spawn_args, { text = true })
+end, { nargs = '?' })
 
 -- set local nowrap
 vim.api.nvim_create_autocmd('FileType', {
@@ -149,7 +182,7 @@ vim.api.nvim_create_autocmd('FileType', {
 
 -- set tab settings for SQL files
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'sql',
+  pattern = { 'sql', 'lua', 'cs' },
   callback = function()
     vim.opt_local.tabstop = 4
     vim.opt_local.softtabstop = 4
@@ -207,3 +240,22 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
 vim.api.nvim_create_user_command('UndotreeCleanCache', function()
   require('undotree_cache').cleanup()
 end, {})
+
+vim.api.nvim_create_user_command('LtexLang', function(opts)
+  vim.lsp.buf_notify(0, 'workspace/didChangeConfiguration', {
+    settings = {
+      ltex = { language = opts.args },
+    },
+  })
+end, {
+  nargs = 1,
+  complete = function()
+    return { 'en-US', 'es' }
+  end,
+})
+
+vim.filetype.add {
+  extension = {
+    ['http'] = 'http',
+  },
+}

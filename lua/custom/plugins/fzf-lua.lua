@@ -193,7 +193,9 @@ return {
       -- FzfLua Git keymaps
       map('n', '<leader>gf', fzf.git_files, { desc = 'Git Files' })
       map('n', '<leader>gc', fzf.git_commits, { desc = 'Git Commits' })
-      map('n', '<leader>gb', fzf.git_bcommits, { desc = 'Git Buffer Commits' })
+      map('n', '<leader>gb', function()
+        fzf.git_bcommits(fullscreen_winopts)
+      end, { desc = 'Git Buffer Commits' })
       map('n', '<leader>gs', function()
         fzf.git_status(fullscreen_winopts)
       end, { desc = 'Git Status' })

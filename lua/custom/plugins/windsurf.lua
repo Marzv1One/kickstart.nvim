@@ -1,6 +1,7 @@
 return {
   {
     'Exafunction/windsurf.vim',
+    enabled = true,
     version = '1.12.8',
     -- version = '1.12.0',
     -- version = '1.10.0',
@@ -32,7 +33,7 @@ return {
         return vim.fn['codeium#Clear']()
       end, { desc = 'Codeium Clear', expr = true, silent = true })
 
-      vim.keymap.set('i', '<M-a>', function()
+      vim.keymap.set('i', '<C-s>', function()
         return vim.fn['codeium#Complete']()
       end, { desc = 'Codeium Complete', expr = true, silent = true })
 

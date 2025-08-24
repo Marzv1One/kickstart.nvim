@@ -159,7 +159,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
+vim.o.scrolloff = 8
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -780,8 +780,12 @@ require('lazy').setup({
         marksman = {},
         ltex = {
           language = 'en-US',
+          additionalRules = {
+            languageModel = { 'es', 'en-US' },
+          },
           dictionary = {
             ['en-US'] = 'C:/Users/eduar/AppData/Local/nvim/.ltex/dictionary.txt',
+            ['es'] = {},
           },
           enabled = { 'markdown', 'text' },
         },
@@ -973,6 +977,8 @@ require('lazy').setup({
 
         ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
 
+        -- ['<A-y>'] = require('minuet').make_blink_map(),
+
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
       },
@@ -986,7 +992,8 @@ require('lazy').setup({
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        trigger = { prefetch_on_insert = true },
       },
 
       sources = {
@@ -1193,6 +1200,9 @@ require('lazy').setup({
         'regex',
         'sql',
         'xml',
+        'http',
+        'powershell',
+        'dockerfile',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,

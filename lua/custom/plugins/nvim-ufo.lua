@@ -32,9 +32,9 @@ local my_function = function(args)
   end
 
   -- Compute relative numbers
-  local rel_H = H_line - lnum
-  local rel_M = M_line - lnum
-  local rel_L = L_line - lnum
+  -- local rel_H = H_line - lnum
+  -- local rel_M = M_line - lnum
+  -- local rel_L = L_line - lnum
 
   return L_line == lnum or H_line == lnum or M_line == lnum
 

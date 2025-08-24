@@ -29,3 +29,6 @@ setup_pwsh_env()
 
 package.path = package.path .. ';' .. vim.fn.stdpath 'config' .. '/after/?.lua'
 -- print(vim.inspect(home_dir))
+
+vim.o.showbreak = '↪'
+vim.o.showtabline = 2

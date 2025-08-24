@@ -40,7 +40,7 @@ return {
       dap.set_log_level 'DEBUG'
 
       -- Keymaps for controlling the debugger
-      vim.keymap.set('n', 'q', function()
+      vim.keymap.set('n', '<leader>dd', function()
         dap.terminate()
         dap.clear_breakpoints()
       end, { desc = 'Terminate and clear breakpoints' })
