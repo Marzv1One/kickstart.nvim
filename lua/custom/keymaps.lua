@@ -29,6 +29,10 @@ map('v', '>', '>gv', { desc = 'Indent right' })
 map('n', '{', '{zz', { desc = 'Through empty lines' })
 map('n', '}', '}zz', { desc = 'Through empty lines' })
 
+-- Through empty lines {  }
+map('n', '*', '*zz', { desc = 'Search' })
+map('n', '#', '#zz', { desc = 'Search' })
+
 -- Spawn commands in Wezterm
 map('n', '<leader>tc', '<cmd>SpawnCrush<CR>', { desc = 'Spawn Crush in new Wezterm window' })
 map('n', '<leader>tg', '<cmd>SpawnLazygit<CR>', { desc = 'Spawn Lazygit in new Wezterm window' })

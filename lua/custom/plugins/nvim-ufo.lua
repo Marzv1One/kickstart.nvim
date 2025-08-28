@@ -51,10 +51,9 @@ local function get_character(args)
   -- vim.notify(vim.inspect(args), vim.log.levels.INFO)
   local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
   if args.lnum ~= cursor_line then
-    return '  ┃'
-  else
-    return require('statuscol.builtin').lnumfunc(args)
+    return '   ┃'
   end
+  return require('statuscol.builtin').lnumfunc(args) .. ' '
   -- return '  ┃'
 end
 

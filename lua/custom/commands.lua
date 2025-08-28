@@ -241,6 +241,80 @@ vim.api.nvim_create_user_command('UndotreeCleanCache', function()
   require('undotree_cache').cleanup()
 end, {})
 
+-- Stop PowerToys process
+vim.api.nvim_create_user_command('StopPowerToys', function()
+  vim.fn.system { 'powershell', '-Command', 'Stop-Process -Name PowerToys -Force' }
+end, {})
+
+-- Helper: Check if node is rendered (has valid mark)
+local function is_valid_node(node)
+  local mark = node.mark
+  if not mark then
+    return false
+  end
+
+  local start_pos = mark:pos_begin() -- { line, col, endline, endcol }
+  if not start_pos or not start_pos[1] then
+    return false
+  end
+
+  -- Line and col should be >= 0
+  return start_pos[1] >= 0 and start_pos[2] >= 0
+end
+
+local function get_snippet_progress()
+  local ls = require 'luasnip'
+  local bufnr = vim.api.nvim_get_current_buf()
+  local current_node = ls.session.current_nodes[bufnr]
+  if not current_node then
+    return nil
+  end
+
+  local snip = current_node.parent and current_node.parent.snippet
+  if not snip or not snip.insert_nodes then
+    return nil
+  end
+
+  local nodes = {}
+  for _, node in ipairs(snip.insert_nodes) do
+    if is_valid_node(node) then
+      table.insert(nodes, node)
+    end
+  end
+
+  if #nodes == 0 then
+    return nil
+  end
+
+  -- Find current node index
+  local current_idx = nil
+  for i, node in ipairs(nodes) do
+    if node == current_node then
+      current_idx = i
+      break
+    end
+  end
+
+  if not current_idx then
+    return nil
+  end
+
+  return {
+    current = current_idx,
+    total = #nodes,
+    percentage = current_idx / #nodes,
+  }
+end
+
+vim.keymap.set({ 'i', 's' }, '<C-g>', function()
+  local prog = get_snippet_progress()
+  if prog then
+    print(('🎯 Snippet: %d/%d (%.0f%%)'):format(prog.current, prog.total, prog.percentage * 100))
+  else
+    print '❌ Not in a valid snippet or no rendered nodes'
+  end
+end, { desc = 'Show snippet progress' })
+
 vim.api.nvim_create_user_command('LtexLang', function(opts)
   vim.lsp.buf_notify(0, 'workspace/didChangeConfiguration', {
     settings = {

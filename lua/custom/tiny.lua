@@ -1,0 +1,60 @@
+-- local config = require('tiny-glimmer').config
+-- local M = {}
+--
+-- local handle_text_change_animation = require('tiny-glimmer.animation.text_change').handle_text_change_animation
+--
+-- local function create_callback(opts)
+--   print(opts.default_animation)
+--   return function(ranges)
+--     for i = 1, #ranges do
+--       local range = ranges[i]
+--
+--       if ranges[i] ~= nil then
+--         require('tiny-glimmer.animation.factory').get_instance():create_named_text_animation('paste_' .. i, opts.default_animation, {
+--           base = { range = range },
+--         })
+--       end
+--     end
+--   end
+-- end
+--
+-- local function animate_paste(opts, mode)
+--   handle_text_change_animation(create_callback(opts))
+-- end
+--
+-- function M.paste()
+--   animate_paste(config.overwrite.paste, ']p')
+-- end
+--
+-- function M.Paste()
+--   animate_paste(config.overwrite.paste, '[p')
+-- end
+--
+-- function M.custom_remap(map, mode, callback)
+--   local lhs = map
+--   local rhs = nil
+--
+--   if type(map) == 'table' then
+--     lhs = map.lhs
+--     rhs = map.rhs
+--   else
+--     if map:lower() == '<c-r>' then
+--       lhs = '<c-r>'
+--     else
+--       lhs = map:sub(1, 1)
+--     end
+--   end
+--
+--   require('tiny-glimmer.hijack').hijack(mode, lhs, rhs, callback)
+-- end
+--
+-- M.setup = function()
+--   M.custom_remap(']p', 'n', function()
+--     M.paste()
+--   end)
+--   M.custom_remap('[p', 'n', function()
+--     M.Paste()
+--   end)
+-- end
+--
+-- return M

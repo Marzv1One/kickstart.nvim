@@ -1,5 +1,6 @@
 return {
   'sontungexpt/better-diagnostic-virtual-text',
+    enabled = false,
   -- event = 'LspAttach',
   event = 'VeryLazy',
   opts = {

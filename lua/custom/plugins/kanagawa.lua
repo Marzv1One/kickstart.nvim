@@ -112,9 +112,14 @@ return {
 
           Substitute = { fg = theme.term[1], bg = theme.term[17] },
           Search = { link = 'Substitute' },
-          CurSearch = { link = 'IncSearch' },
+          IncSearch = { fg = palette.sumiInk3, bg = theme.diag.error },
+          CurSearch = { fg = theme.ui.fg, bg = 'none' },
 
-          MiniJump = { link = 'Search' },
+          MiniJump = {
+            fg = theme.ui.bg_gutter,
+            bg = theme.syn.special2,
+            bold = true,
+          },
           MiniSurround = { fg = palette.sumiInk3, bg = palette.surimiOrange },
           EyelinerPrimary = {
             fg = theme.syn.special2,
@@ -252,7 +257,7 @@ return {
           vim.fn.sign_define('smoothcursor', { text = '' })
         elseif current_mode_name == 'C' then
           set_hl(0, 'SmoothCursor', { fg = theme.syn.special3 })
-          vim.fn.sign_define('smoothcursor', { text = '' })
+          vim.fn.sign_define('smoothcursor', { text = '' })
         elseif current_mode_name == 'V' then
           set_hl(0, 'SmoothCursor', { fg = theme.syn.special1 })
           vim.fn.sign_define('smoothcursor', { text = '' })

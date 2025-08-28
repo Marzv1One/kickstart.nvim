@@ -5,11 +5,98 @@ local icons = require('custom.heirline.common').icons
 local separators = require('custom.heirline.common').separators
 local dim = require('custom.heirline.common').dim
 
+local kirby_default = '(>*-*)>'
+
+local axolotl_default = '꒰(˶• ᴗ •˶)꒱'
+local axolotl_frown = '꒰(˶• ˕ •˶)꒱' -- gentle frown, concerned
+local axolotl_curious = '꒰(˶˃ ᴗ ˂˶)꒱' -- wide-eyed, peering left
+local axolotl_sleepy = '꒰(˶• o •˶)꒱' -- half-closed eyes, floating
+local axolotl_happy = '꒰(˶• 3 •˶)꒱' -- happy, mouth like a tiny heart 
+
+local axolotl_surprised = '꒰(˶• ᗜ •˶)꒱' -- open-mouthed surprise
+-- local axolotl_gills = '︵‿︵' -- gill tufts (use in custom expressions)
+-- local axolotl_gill_frame = '꒰( ︵‿︵ • ᴗ • ︵‿︵ )꒱' -- full gill burst
 local ViMode = {
   init = function(self)
     self.mode = vim.fn.mode(1)
   end,
   static = {
+    -- Your new mode table
+    mode_axolotl = {
+      n = axolotl_default,
+      no = axolotl_frown,
+      nov = axolotl_default,
+      noV = axolotl_default,
+      ['no\22'] = axolotl_default,
+      niI = axolotl_frown,
+      niR = axolotl_frown,
+      niV = axolotl_frown,
+      nt = axolotl_frown,
+      v = '꒰(˶• ᗜ •˶)꒱',
+      vs = '꒰(˶• ᗜ •˶)꒱',
+      V = '꒰(˶• ᗜ <˶)꒱',
+      Vs = '꒰(˶• ᗜ <˶)꒱',
+      ['\22'] = '꒰(˶> ᗜ <˶)꒱',
+      ['\22s'] = '꒰(˶> ᗜ <˶)꒱',
+      s = axolotl_happy,
+      S = axolotl_happy,
+      ['\19'] = axolotl_happy,
+      i = axolotl_curious,
+      ic = axolotl_frown,
+      ix = axolotl_frown,
+      R = axolotl_curious,
+      Rc = axolotl_curious,
+      Rx = axolotl_curious,
+      Rv = axolotl_curious,
+      Rvc = axolotl_curious,
+      Rvx = axolotl_curious,
+      c = axolotl_sleepy,
+      cv = axolotl_sleepy,
+      ce = axolotl_sleepy,
+      r = axolotl_sleepy,
+      rm = axolotl_default,
+      ['r?'] = axolotl_curious,
+      ['!'] = axolotl_sleepy,
+      t = axolotl_sleepy,
+    },
+
+    mode_kirby = {
+      n = '<(•ᴗ•)>',
+      no = '<(•ᴗ•)>',
+      nov = '<(•ᴗ•)>',
+      noV = '<(•ᴗ•)>',
+      ['no\22'] = '<(•ᴗ•)>',
+      niI = kirby_default,
+      niR = '<(•o•)>',
+      niV = '<(•o•)>',
+      nt = kirby_default,
+      v = '(>•-•)>',
+      vs = '(>•-•)>',
+      V = '(v•-•)v',
+      Vs = '(v•-•)v',
+      ['\22'] = '(v•-•)>',
+      ['\22s'] = '(v•-•)>',
+      s = '(>•-•)>',
+      S = '(>•-•)>',
+      ['\19'] = '(>•-•)>',
+      i = '<(•o•)>',
+      ic = kirby_default,
+      ix = kirby_default,
+      R = '<(•o•)>',
+      Rc = '<(•o•)>',
+      Rx = '<(•o•)>',
+      Rv = '<(•o•)>',
+      Rvc = '<(•o•)>',
+      Rvx = '<(•o•)>',
+      c = kirby_default,
+      cv = '<(•ᴗ•)>',
+      ce = '<(•ᴗ•)>',
+      r = kirby_default,
+      rm = kirby_default,
+      ['r?'] = kirby_default,
+      ['!'] = '<(•ᴗ•)>',
+      t = kirby_default,
+    },
     mode_names = {
       n = 'N',
       no = 'N?',
@@ -48,19 +135,25 @@ local ViMode = {
     },
   },
   provider = function(self)
-    return icons.vim .. '%2(' .. self.mode_names[self.mode] .. '%)'
+    return '%2(' .. ' ' .. self.mode_axolotl[self.mode] .. '%)'
+    -- return '%2(' .. self.mode_kirby[self.mode] .. ' ' .. self.mode .. '%)'
+    -- return icons.vim .. '%2(' .. self.mode_names[self.mode] .. '%)'
   end,
   hl = function(self)
     local color = self:mode_color()
-    return { fg = color, bold = true }
+    return { fg = 'bright_bg', bold = true }
   end,
-  update = {
-    'ModeChanged',
-    pattern = '*:*',
-    callback = vim.schedule_wrap(function()
-      vim.cmd 'redrawstatus'
-    end),
-  },
+  -- update = {
+  --   'ModeChanged',
+  --   'BufEnter',
+  --   'CmdlineLeave',
+  --   'WinEnter',
+  --   -- pattern = '*:*',
+  --   -- callback = vim.schedule_wrap(function()
+  --   --   -- print(vim.fn.mode())
+  --   --   vim.cmd 'redrawstatus'
+  --   -- end),
+  -- },
 }
 
 local FileIcon = {
@@ -428,25 +521,145 @@ local Git = {
 --   end,
 --   hl = { fg = 'red', bold = true },
 -- }
-local Snippets = {
+local function is_valid_node(node)
+  local mark = node.mark
+  if not mark then
+    return false
+  end
+
+  local start_pos = mark:pos_begin() -- { line, col, endline, endcol }
+  if not start_pos or not start_pos[1] then
+    return false
+  end
+
+  -- Line and col should be >= 0
+  return start_pos[1] >= 0 and start_pos[2] >= 0
+end
+
+local function get_snippet_progress()
+  local ls = require 'luasnip'
+  local bufnr = vim.api.nvim_get_current_buf()
+  local current_node = ls.session.current_nodes[bufnr]
+  if not current_node then
+    return nil
+  end
+
+  local snip = current_node.parent and current_node.parent.snippet
+  if not snip or not snip.insert_nodes then
+    return nil
+  end
+
+  local nodes = {}
+  for _, node in ipairs(snip.insert_nodes) do
+    if is_valid_node(node) then
+      table.insert(nodes, node)
+    end
+  end
+
+  if #nodes == 0 then
+    return nil
+  end
+
+  -- Find current node index
+  local current_idx = nil
+  for i, node in ipairs(nodes) do
+    if node == current_node then
+      current_idx = i
+      break
+    end
+  end
+
+  if not current_idx then
+    return nil
+  end
+
+  return {
+    current = current_idx,
+    total = #nodes,
+    percentage = current_idx / #nodes,
+  }
+end
+
+local SnippetBar = {
   condition = function()
     return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
   end,
+
   provider = function()
-    local ls = require 'luasnip'
-    -- local forward = (vim.fn['UltiSnips#CanJumpForwards']() == 1) and ' ' or ''
-    local right_arrow = ' 󰍟'
-    -- local right_arrow = ' ~>'
-    local left_arrow = '󰍞'
-    -- local left_arrow = '<~'
-    local forward = ls.expand_or_jumpable() and right_arrow or ''
-    -- local forward = ls.expandable() or ls.jumpable(1) and right_arrow or ''
-    -- local backward = (vim.fn['UltiSnips#CanJumpBackwards']() == 1) and ' ' or ''
-    local backward = ls.jumpable(-1) and left_arrow or ''
-    return backward .. forward
+    local prog = get_snippet_progress()
+    if not prog then
+      return ''
+    end
+    local filled = '●'
+    -- local filled = '▰'
+    local empty = '○'
+    -- local empty = '▱'
+    local w = prog.total
+    local f = math.max(1, math.floor(prog.percentage * w))
+    return ' ' .. string.rep(filled, f) .. string.rep(empty, w - f) .. ' '
   end,
-  hl = { fg = 'red', bold = true },
+
+  -- hl = { fg = 'red' },
+  hl = { fg = 'purple' },
+  -- update = 'LuasnipUpdate', -- 🔥 live updates!
 }
+
+local SnippetBarBlocks = {
+  condition = function()
+    return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
+  end,
+
+  provider = function()
+    local prog = get_snippet_progress()
+    -- print(vim.inspect(prog))
+    if not prog or not prog.current then
+      return ''
+    end
+
+    local full = '▰' -- U+25F0
+    local empty = '▱' -- U+25F1
+    local count = 10
+
+    local filled = math.floor(prog.percentage * count)
+    local empty_count = count - filled
+
+    return ' ' .. string.rep(full, filled) .. string.rep(empty, empty_count) .. ' '
+  end,
+
+  hl = { fg = '#ff9900', bg = '#333333' },
+}
+-- local Snippets = {
+--   condition = function()
+--     return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
+--   end,
+--
+--   provider = function()
+--     local ls = require 'luasnip'
+--     local right_arrow = ' ' -- NF: right arrow (e.g., \uf061)
+--     local left_arrow = ' ' -- NF: left arrow (e.g., \uf060)
+--     local right_left_arrow = ' ' -- NF: double arrow (e.g., \uf0ec)
+--
+--     local can_jump_forward = ls.expand_or_jumpable()
+--     local can_jump_backward = ls.jumpable(-1)
+--
+--     if can_jump_forward and can_jump_backward then
+--       return right_left_arrow
+--     elseif can_jump_backward then
+--       return left_arrow
+--     elseif can_jump_forward then
+--       return right_arrow
+--     else
+--       return ''
+--     end
+--   end,
+--
+--   hl = { fg = 'red', bold = true },
+-- }
+-- local right_arrow = ' '
+-- local right_left_arrow = ''
+-- -- local right_arrow = ' ~>'
+-- local left_arrow = ' '
+-- -- local left_arrow = '<~'
 
 local DAPMessages = {
   condition = function()
@@ -550,17 +763,17 @@ local WorkDir = {
   },
 }
 
--- local CodeiumStatus = {
---   condition = function()
---     return not conditions.buffer_matches {
---       filetype = { 'dashboard' },
---     }
---   end,
---   hl = { fg = 'cyan' },
---   provider = function()
---     return '󰚩 ' .. vim.fn['codeium#GetStatusString']()
---   end,
--- }
+local CodeiumStatus = {
+  condition = function()
+    return not conditions.buffer_matches {
+      filetype = { 'dashboard' },
+    }
+  end,
+  hl = { fg = 'cyan' },
+  provider = function()
+    return '󰚩 ' .. vim.fn['codeium#GetStatusString']()
+  end,
+}
 
 local DRLSPStatus = {
   condition = conditions.lsp_attached(),
@@ -727,6 +940,8 @@ local MacroComp = {
   },
 }
 
+MacroComp = utils.surround({ separators.slant_left, separators.inverted_slant_right }, 'bright_bg', MacroComp)
+
 local MacroRec = {
   condition = function()
     return vim.fn.reg_recording() ~= '' and vim.o.cmdheight == 0
@@ -761,9 +976,13 @@ local ShowCmd = {
   condition = function()
     return vim.o.cmdheight == 0
   end,
-  provider = ':%3.5(%S%)',
+  provider = ' %3.5(%S%)',
   hl = function(self)
-    return { bold = true, fg = self:mode_color() }
+    return {
+      bold = true,
+      fg = 'bright_bg',
+      --[[ fg = self:mode_color() ]]
+    }
   end,
 }
 
@@ -795,20 +1014,47 @@ local MatchParen = {
 local Align = { provider = '%=' }
 local Space = { provider = ' ' }
 
-ViMode = utils.surround({ separators.rounded_left, separators.rounded_right }, 'bright_bg', {
+-- ViMode = utils.surround({ separators.rounded_left, separators.rounded_right }, 'bright_bg', {
+ViMode = utils.surround({ separators.block, separators.inverted_slant_right }, function()
+  local mode = vim.fn.mode(1)
+  mode_colors = {
+    n = 'red',
+    no = 'red',
+    niI = 'red',
+    i = 'orange',
+    v = 'cyan',
+    V = 'cyan',
+    ['\22'] = 'cyan', -- this is an actual ^V, type <C-v><C-v> in insert mode
+    c = 'green',
+    s = 'purple',
+    S = 'purple',
+    ['\19'] = 'purple', -- this is an actual ^S, type <C-v><C-s> in insert mode
+    R = 'orange',
+    r = 'orange',
+    ['!'] = 'red',
+    t = 'green',
+    nt = 'green',
+  }
+  return mode_colors[mode] or 'red'
+end, {
   -- MacroRec,
-  MacroComp,
+  -- MacroComp,
   ViMode,
-  Snippets,
+  -- Snippets,
   ShowCmd,
-  MatchParen,
+  -- MatchParen,
+})
+
+ViMode = utils.surround({ '', separators.inverted_slant_right }, 'bright_bg', {
+  ViMode,
+  SnippetBar,
+  MacroComp,
 })
 
 local DefaultStatusline = {
   ViMode,
   Space,
-  Spell,
-  WorkDir,
+  -- WorkDir,
   FileNameBlock,
   Arrow,
   { provider = '%<' },
@@ -897,11 +1143,11 @@ local StatusLines = {
   static = {
     mode_colors = {
       n = 'red',
-      i = 'green',
+      i = 'orange',
       v = 'cyan',
       V = 'cyan',
       ['\22'] = 'cyan', -- this is an actual ^V, type <C-v><C-v> in insert mode
-      c = 'orange',
+      c = 'green',
       s = 'purple',
       S = 'purple',
       ['\19'] = 'purple', -- this is an actual ^S, type <C-v><C-s> in insert mode
@@ -909,6 +1155,7 @@ local StatusLines = {
       r = 'orange',
       ['!'] = 'red',
       t = 'green',
+      nt = 'green',
     },
     mode_color = function(self)
       local mode = conditions.is_active() and vim.fn.mode() or 'n'
@@ -959,7 +1206,7 @@ local WinBar = {
   -- },
   {
     condition = function()
-      return conditions.buffer_matches { buftype = { 'terminal' } }
+      return conditions.buffer_matches { buftype = { 'terminal', 'acwrite' } }
     end,
     utils.surround({ '', separators.rounded_right }, 'dark_red', {
       FileType,
@@ -980,10 +1227,11 @@ local WinBar = {
     },
     {
       -- provider = "      ",
-      Navic,
-      { provider = '%<' },
+      WorkDir,
       Align,
-      FileNameBlock,
+      { provider = '%<' },
+      Navic,
+      -- FileNameBlock,
       CloseButton,
     },
   }),

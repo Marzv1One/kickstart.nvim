@@ -14,6 +14,9 @@ return {
         end,
         on_close = function()
           vim.cmd 'silent !glazewm command wm-toggle-pause'
+          vim.api.nvim_exec_autocmds('User', {
+            pattern = '*:*',
+          })
         end,
       },
       actions = {
@@ -127,8 +130,8 @@ return {
       git = {
         status = {
           actions = {
-            ['ctrl-l'] = { fn = actions.git_unstage, reload = true },
-            ['ctrl-h'] = { fn = actions.git_stage, reload = true },
+            ['alt-l'] = { fn = actions.git_unstage, reload = true },
+            ['alt-h'] = { fn = actions.git_stage, reload = true },
           },
         },
       },

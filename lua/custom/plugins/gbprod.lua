@@ -9,8 +9,8 @@ return {
     opts = {
       ring = { storage = 'sqlite' },
       highlight = {
-        on_put = true,
-        on_yank = true,
+        on_put = false,
+        on_yank = false,
       },
     },
     keys = {
@@ -36,11 +36,21 @@ return {
   },
   {
     'gbprod/substitute.nvim',
+    dependencies = {
+      'gbprod/yanky.nvim',
+      -- 'rachartier/tiny-glimmer.nvim',
+    },
     config = function()
       require('substitute').setup {
-        yank_substituted_text = true,
-        on_substitute = require('yanky.integration').substitute(),
+        yank_substituted_text = false,
+        on_substitute = function(args)
+          require('yanky.integration').substitute()
+          require('tiny-glimmer.support.substitute').substitute_cb(args)
+        end,
         preserve_cursor_position = true,
+        highlight_substituted_text = {
+          enabled = false,
+        },
         range = {
           prompt_current_text = true,
           group_substituted_text = true,

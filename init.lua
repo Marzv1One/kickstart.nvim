@@ -922,7 +922,7 @@ require('lazy').setup({
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
               require('luasnip.loaders.from_vscode').lazy_load {
-                paths = 'C:\\Users\\eduar\\AppData\\Local\\nvim\\snippets',
+                paths = vim.fn.stdpath 'config' .. '/snippets',
               }
             end,
           },
