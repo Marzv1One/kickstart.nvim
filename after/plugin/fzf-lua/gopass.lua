@@ -19,6 +19,9 @@ local function copy_to_clipboard(selected)
     vim.notify('Failed to copy password: ' .. password_entry, vim.log.levels.ERROR)
   end
   vim.cmd 'silent !glazewm command wm-toggle-pause'
+  vim.schedule(function()
+    vim.cmd 'silent !glazewm command wm-cycle-focus'
+  end)
 end
 
 -- Configure fzf-lua with gopass entries and custom actions

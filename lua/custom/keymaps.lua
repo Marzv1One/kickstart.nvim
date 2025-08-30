@@ -25,6 +25,17 @@ map('n', 'N', 'Nzz', { desc = 'Find previous' })
 map('v', '<', '<gv', { desc = 'Indent left' })
 map('v', '>', '>gv', { desc = 'Indent right' })
 
+-- This uses a string command so visual marks are saved *before* Lua runs
+vim.keymap.set('x', '<leader>sr', [[:<C-u>lua require('custom.substitute').substitute_visual_selection()<CR>]], {
+  desc = 'Substitute visual selection globally',
+  silent = true,
+})
+
+-- Substitute motion range with yanked text (" register)
+vim.keymap.set('n', 'sy', function()
+  require('custom.substitute').start_yank()
+end, { desc = 'Substitute motion with " register', silent = true })
+
 -- Through empty lines {  }
 map('n', '{', '{zz', { desc = 'Through empty lines' })
 map('n', '}', '}zz', { desc = 'Through empty lines' })
@@ -39,11 +50,10 @@ map('n', '<leader>tg', '<cmd>SpawnLazygit<CR>', { desc = 'Spawn Lazygit in new W
 map('n', '<leader>tb', '<cmd>SpawnBat<CR>', { desc = 'Spawn Bat in new Wezterm window' })
 map('n', '<leader>ts', '<cmd>SpawnSpf<CR>', { desc = 'Spawn Superfile in new Wezterm window' })
 map('n', '<leader>tm', '<cmd>SpawnGlow<CR>', { desc = 'Spawn Glow in new Wezterm window' })
-map('n', '<leader>tt', '<cmd>SpawnTerm<CR>', { desc = 'Spawn new Wezterm window' })
+map('n', '<leader>tt', '<cmd>SpawnWezterm<CR>', { desc = 'Spawn new Wezterm window' })
+map('n', '<leader>tn', '<cmd>SpawnWezterm tab<CR>', { desc = 'Spawn new Wezterm tab' })
+map('n', '<leader>tv', '<cmd>SpawnNvim<CR>', { desc = 'Spawn new Neovim instance' })
 map('n', '<leader>tp', '<cmd>silent !glazewm command wm-toggle-pause<CR>', { desc = 'Toggle GlazeWM pause', silent = true })
-
--- Gopass integration
-map('n', '<leader>gp', '<cmd>luafile ~/.config/nvim/after/plugin/fzf-lua/gopass.lua<CR>', { desc = 'Gopass menu', silent = true })
 
 -- Optional: Add visual mode mappings for commands that might work with selections
 -- map('v', '<leader>u', ':UnescapeUnicode<CR>', { desc = 'Unescape Unicode in selection' })

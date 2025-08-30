@@ -11,7 +11,7 @@ local axolotl_default = '꒰(˶• ᴗ •˶)꒱'
 local axolotl_frown = '꒰(˶• ˕ •˶)꒱' -- gentle frown, concerned
 local axolotl_curious = '꒰(˶˃ ᴗ ˂˶)꒱' -- wide-eyed, peering left
 local axolotl_sleepy = '꒰(˶• o •˶)꒱' -- half-closed eyes, floating
-local axolotl_happy = '꒰(˶• 3 •˶)꒱' -- happy, mouth like a tiny heart 
+local axolotl_happy = '꒰(˶• 3 •˶)꒱' -- happy, mouth like a tiny heart
 
 local axolotl_surprised = '꒰(˶• ᗜ •˶)꒱' -- open-mouthed surprise
 -- local axolotl_gills = '︵‿︵' -- gill tufts (use in custom expressions)
@@ -1063,7 +1063,7 @@ local DefaultStatusline = {
   Space,
   Diagnostics,
   Space,
-  -- CodeiumStatus,
+  CodeiumStatus,
   Align,
   -- { flexible = 3,   { Navic, Space }, { provider = "" } },
   -- Align,

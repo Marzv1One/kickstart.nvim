@@ -85,6 +85,13 @@ end
 
 local icon_padding = fzf.utils.ansi_codes.blue '󰝰' .. ' 󰇝  '
 
+local function escape_pattern(str, pattern, replace, n)
+  pattern = string.gsub(pattern, '[%(%)%.%+%-%*%?%[%]%^%$%%]', '%%%1') -- escape pattern
+  replace = string.gsub(replace, '[%%]', '%%%%') -- escape replacement
+
+  return string.gsub(str, pattern, replace, n)
+end
+
 function M.open()
   local opts = {}
   opts.prompt = 'Persisted Sessions> '
@@ -96,6 +103,20 @@ function M.open()
     ['enter'] = get_selected_session,
     ['ctrl-y'] = get_selected_session,
     ['ctrl-x'] = delete_selected_session,
+    ['ctrl-e'] = function(selected)
+      local sessions = get_sessions()
+      local session = get_session(selected[1], sessions)
+      if session then
+        local session_name = session.dir_path
+        if vim.fn.has 'win32' == 1 then
+          local sep = utils.dir_pattern()
+          session_name = escape_pattern(session_name, sep, ':', 1)
+          session_name = escape_pattern(session_name, sep, '\\')
+        end
+
+        vim.cmd(string.format('SpawnWezterm cmd=nvim cwd=%s tab', session_name))
+      end
+    end,
   }
 
   local sessions = get_sessions()
