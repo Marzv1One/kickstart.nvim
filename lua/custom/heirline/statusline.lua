@@ -160,7 +160,8 @@ local FileIcon = {
   init = function(self)
     local filename = self.filename
     local extension = vim.fn.fnamemodify(filename, ':e')
-    self.icon, self.icon_color = require('nvim-web-devicons').get_icon_color(filename, extension, { default = true })
+    local name = vim.fs.basename(filename)
+    self.icon, self.icon_color = require('nvim-web-devicons').get_icon_color(name, extension, { default = true })
   end,
   provider = function(self)
     return self.icon and (self.icon .. ' ')
@@ -168,6 +169,7 @@ local FileIcon = {
   hl = function(self)
     return { fg = self.icon_color }
   end,
+  update = 'BufEnter',
 }
 
 local FileName = {
@@ -197,6 +199,7 @@ local FileName = {
       return vim.fn.pathshorten(self.lfilename)
     end,
   },
+  update = 'BufEnter',
 }
 
 local FileNameModifier = {
@@ -205,6 +208,7 @@ local FileNameModifier = {
       return { fg = 'cyan', bold = true, force = true }
     end
   end,
+  update = 'BufEnter',
 }
 
 local FileFlags = {

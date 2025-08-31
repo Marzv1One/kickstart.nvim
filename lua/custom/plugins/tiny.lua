@@ -67,8 +67,8 @@ return {
             name = 'fade',
 
             settings = {
-              from_color = 'Visual',
-              to_color = 'DiffDelete',
+              from_color = 'DiffDelete',
+              to_color = 'Visual',
 
               max_duration = 500,
               min_duration = 500,
@@ -81,8 +81,8 @@ return {
             name = 'fade',
 
             settings = {
-              from_color = 'DiffAdd',
-              to_color = 'Visual',
+              from_color = 'Visual',
+              to_color = 'DiffAdd',
 
               max_duration = 500,
               min_duration = 500,

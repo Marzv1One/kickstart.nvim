@@ -276,6 +276,9 @@ require('lazy').setup({
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
+      diff_opts = {
+        algorithm = 'histogram',
+      },
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -1147,8 +1150,8 @@ require('lazy').setup({
       require('mini.bracketed').setup()
       require('mini.move').setup {
         mappings = {
-          line_down = '<M-g>',
-          line_up = '<M-b>',
+          line_down = '<M-b>',
+          line_up = '<M-g>',
         },
       }
       require('mini.bufremove').setup()
