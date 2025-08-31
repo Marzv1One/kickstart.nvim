@@ -24,33 +24,26 @@ Code style
 Assistant notes
 - No Cursor/Copilot rules found. If .cursor/rules/** or .github/copilot-instructions.md appear, mirror key rules here.
 - Keep this file updated with any new workflows (lint, format, health, profiling).
-You can add that information to your CRUSH.md file! Here's how you can specify the Windows environment with PowerShell Core:
 
-## Environment Information
-- Operating System: Windows
-- Shell: PowerShell Core
-- Path separator: Backslash (\) 
-- Line endings: CRLF
-- Preferred shell commands: PowerShell cmdlets and Windows-compatible commands
+## Windows / PowerShell Core
+- OS: Windows; Shell: PowerShell Core (pwsh)
+- Path separator: \\; Line endings: CRLF
+- Prefer PowerShell cmdlets when possible
 
-## Shell Command Guidelines
-When writing shell commands for this environment:
-- Use PowerShell syntax and cmdlets
-- Use backslash (\) for file paths instead of forward slash (/)  
-- Use `;` or `&&` to chain commands
-- Use PowerShell's built-in commands rather than Unix utilities when possible
-- For cross-platform compatibility, prefer commands that work in PowerShell Core
+## Common PowerShell patterns
+- List: Get-ChildItem
+- Cd: Set-Location
+- Remove: Remove-Item
+- Mkdir: New-Item -ItemType Directory
+- Exists: Test-Path
 
-## Common PowerShell Patterns
-- List files: `Get-ChildItem` or `ls`
-- Change directory: `Set-Location` or `cd`
-- Remove files: `Remove-Item` or `rm`
-- Create directory: `New-Item -ItemType Directory` or `mkdir`
-- Check if file exists: `Test-Path`
+## Git EOL normalization (repo + submodule)
+Use when seeing "LF will be replaced by CRLF" warnings.
 
-## Notes
-- PowerShell Core (pwsh) is the preferred shell
-- Some Unix-like commands are available through aliases
-- Use backtick (`) for line continuation in PowerShell
-
-This information would help any LLM (including Crush) understand that they should generate PowerShell Core commands rather than bash/Unix commands when helping with shell-related tasks in your environment.
+- Disable autocrlf in main repo and submodule, then renormalize:
+  git config core.autocrlf false
+  git -C lua/custom/nvim-dr-lsp config core.autocrlf false
+  git add --renormalize .
+  git -C lua/custom/nvim-dr-lsp add --renormalize .
+  git status
+  git diff
