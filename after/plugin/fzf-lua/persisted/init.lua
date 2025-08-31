@@ -114,7 +114,9 @@ function M.open()
           session_name = escape_pattern(session_name, sep, '\\')
         end
 
-        vim.cmd(string.format('SpawnWezterm cmd=nvim cwd=%s tab', session_name))
+        local cmd = string.format('SpawnWezterm cmd=nvim cwd=%s tab', session_name)
+        -- print(cmd)
+        vim.cmd(cmd)
       end
     end,
   }

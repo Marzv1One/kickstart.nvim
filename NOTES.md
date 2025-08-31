@@ -13,7 +13,7 @@
 - [x] smart-column
 - [x] nvim-spider, nvim-scissos, dr-lsp, origami
 - [x] arrow
-- [ ] kulala
+- [x] kulala
 - [x] transparent
 - [x] treesj
 - [x] focus
@@ -25,7 +25,7 @@
 - [x] dashboard
 - [ ] hardtime
 - [ ] WezTerm plugins
-- [ ] neo composer
+- [x] neo composer
 - [?] dial
 - [?] gx
 - [?] image preview
@@ -46,11 +46,17 @@
 - [x] xmllint
 - [x] down arrow nvim-ufo
 - [x] emoji blink-cmp
-- [ ] FZF Lua git + toggleterm
-- [ ] JSON LSP
+- [x] JSON LSP
 - [ ] YAML LSP
 - [ ] TOML LSP
 
 
 ### other way to sync lazy
 nvim --headless "+Lazy sync" +qa
+
+#### not g<key> keymaps set
+- ga ?
+- gl
+- gy
+- gz
+

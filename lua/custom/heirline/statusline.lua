@@ -280,10 +280,21 @@ local FileSize = {
 }
 
 local FileLastModified = {
+  condition = function()
+    local allowed_filetypes = { 'markdown', 'text', 'json', 'csv' }
+    for _, value in ipairs(allowed_filetypes) do
+      if vim.bo.filetype == value then
+        return true
+      end
+    end
+    return false
+    -- return vim.bo.filetype == 'text' or vim.bo.filetype == 'json' or vim.bo.filetype == 'csv'
+  end,
   provider = function()
     local ftime = vim.fn.getftime(vim.api.nvim_buf_get_name(0))
     return (ftime > 0) and os.date('%c', ftime)
   end,
+  -- hl = 'Type',
 }
 
 local Ruler = {
@@ -291,8 +302,8 @@ local Ruler = {
   -- %L = number of lines in the buffer
   -- %c = column number
   -- %P = percentage through file of displayed window
-  provider = '%7(%l/%3L%):%2c %P',
-  hl = { fg = utils.get_highlight('Special').fg },
+  provider = '%7(%l/%3L%):%2c %P ',
+  hl = { bg = utils.get_highlight('Special').fg, fg = 'bright_bg' },
 }
 
 local ScrollBar = {
@@ -910,7 +921,7 @@ local SearchCount = {
       return ''
     end
   end,
-  hl = { fg = 'purple', bold = true },
+  hl = { fg = 'purple', bold = true, bg = 'bright_bg' },
 }
 
 local MacroComp = {
@@ -1051,6 +1062,22 @@ ViMode = utils.surround({ '', separators.inverted_slant_right }, 'bright_bg', {
   MacroComp,
 })
 
+Ruler = utils.surround({ separators.slant_left, '' }, 'cyan', {
+  Ruler,
+})
+local RulerScrollBark = utils.surround({ '', '' }, 'bright_bg', {
+  Ruler,
+  ScrollBar,
+})
+
+local StatusFileType = utils.surround({ separators.block, separators.block }, 'bright_bg', {
+  FileType,
+})
+StatusFileType = utils.surround({ separators.slant_left, '' }, 'bright_bg', {
+  StatusFileType,
+  { flexible = 3, { FileLastModified, Space }, { provider = '' } },
+})
+
 local DefaultStatusline = {
   ViMode,
   Space,
@@ -1072,13 +1099,14 @@ local DefaultStatusline = {
   { flexible = 2, { DRLSPStatus }, { hl = { fg = 'green' }, provider = '..' } },
   -- VirtualEnv,
   Space,
-  FileType,
-  { flexible = 3, { FileEncoding, Space }, { provider = '' } },
-  Space,
-  Ruler,
+  StatusFileType,
+  -- { flexible = 3, { FileEncoding, Space }, { provider = '' } },
+  -- Space,
   SearchCount,
-  Space,
-  ScrollBar,
+  RulerScrollBark,
+  -- Ruler,
+  -- Space,
+  -- ScrollBar,
 }
 
 local InactiveStatusline = {

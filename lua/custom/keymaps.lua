@@ -26,15 +26,24 @@ map('v', '<', '<gv', { desc = 'Indent left' })
 map('v', '>', '>gv', { desc = 'Indent right' })
 
 -- This uses a string command so visual marks are saved *before* Lua runs
-vim.keymap.set('x', '<leader>sr', [[:<C-u>lua require('custom.substitute').substitute_visual_selection()<CR>]], {
+vim.keymap.set('x', '<leader>ss', [[:<C-u>lua require('custom.substitute').substitute_visual_selection()<CR>]], {
   desc = 'Substitute visual selection globally',
   silent = true,
 })
 
--- Substitute motion range with yanked text (" register)
-vim.keymap.set('n', 'sy', function()
+-- Substitute with yanked text (" register)
+vim.keymap.set('n', 'gy', function()
   require('custom.substitute').start_yank()
 end, { desc = 'Substitute motion with " register', silent = true })
+vim.keymap.set('n', 'gyh', function()
+  require('custom.substitute').line_yank()
+end, { desc = 'Substitute line with " register', silent = true })
+vim.keymap.set('n', 'gY', function()
+  require('custom.substitute').eol_yank()
+end, { desc = 'Substitute to EOL with " register', silent = true })
+vim.keymap.set('x', 'gy', function()
+  require('custom.substitute').visual_yank()
+end, { desc = 'Substitute visual with " register', silent = true })
 
 -- Through empty lines {  }
 map('n', '{', '{zz', { desc = 'Through empty lines' })
@@ -57,6 +66,20 @@ map('n', '<leader>tp', '<cmd>silent !glazewm command wm-toggle-pause<CR>', { des
 
 -- Optional: Add visual mode mappings for commands that might work with selections
 -- map('v', '<leader>u', ':UnescapeUnicode<CR>', { desc = 'Unescape Unicode in selection' })
+
+-- Simple substitute command starter (very-magic), cursor after \v
+vim.keymap.set('n', '<leader>sn', function()
+  vim.api.nvim_feedkeys(':', 'n', false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('%s/\\v/g', true, false, true), 'n', false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Left><Left>', true, false, true), 'n', false)
+end, { desc = 'Start :%s/\v…/g with cursor after \\v', silent = true })
+
+-- Visual-range variant of <leader>sn: start :'<,'>s/\v…/g with cursor after \v
+vim.keymap.set('x', '<leader>sn', function()
+  vim.api.nvim_feedkeys(':', 'n', false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('s/\\v/g', true, false, true), 'n', false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Left><Left>', true, false, true), 'n', false)
+end, { desc = 'Start :s/\\v…/g with cursor after \\v', silent = true })
 
 -- Incremental Rename
 vim.keymap.set('n', '<leader>rr', ':IncRename ', { desc = 'Incremental Rename' })

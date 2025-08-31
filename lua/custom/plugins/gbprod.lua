@@ -64,10 +64,10 @@ return {
       map('n', 'S', require('substitute').eol, { noremap = true, desc = 'Substitute EOL' })
       map('x', 's', require('substitute').visual, { noremap = true, desc = 'Substitute Visual' })
 
-      map('n', 'sx', require('substitute.exchange').operator, { noremap = true, desc = 'Substitute Exchange' })
-      map('n', 'sX', require('substitute.exchange').line, { noremap = true, desc = 'Substitute Exchange Line' })
-      map('x', 'sx', require('substitute.exchange').visual, { noremap = true, desc = 'Substitute Exchange Visual' })
-      map('n', 'sxc', require('substitute.exchange').cancel, { noremap = true, desc = 'Substitute Exchange Cancel' })
+      map('n', 'gl', require('substitute.exchange').operator, { noremap = true, desc = 'Substitute Exchange' })
+      map('n', 'glh', require('substitute.exchange').line, { noremap = true, desc = 'Substitute Exchange Line' })
+      map('x', 'gl', require('substitute.exchange').visual, { noremap = true, desc = 'Substitute Exchange Visual' })
+      map('n', 'glc', require('substitute.exchange').cancel, { noremap = true, desc = 'Substitute Exchange Cancel' })
     end,
   },
   {
