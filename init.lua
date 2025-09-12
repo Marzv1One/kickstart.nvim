@@ -415,6 +415,11 @@ require('lazy').setup({
               name = 'CrushJson',
               color = '#ff00ff',
             },
+            ['CRUSH.md'] = {
+              icon = '󰥱',
+              name = 'CrushMd',
+              color = '#ff00ff',
+            },
           },
         },
       },
@@ -520,7 +525,15 @@ require('lazy').setup({
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-      { 'mason-org/mason.nvim', opts = {} },
+      {
+        'mason-org/mason.nvim',
+        opts = {
+          registries = {
+            'github:mason-org/mason-registry',
+            'github:Crashdummyy/mason-registry',
+          },
+        },
+      },
       'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -704,7 +717,8 @@ require('lazy').setup({
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
+        -- float = { border = 'rounded', source = 'if_many' },
+        float = false,
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -781,27 +795,29 @@ require('lazy').setup({
           },
         },
         marksman = {},
-        ltex = {
-          language = 'en-US',
-          additionalRules = {
-            languageModel = { 'es', 'en-US' },
-          },
-          dictionary = {
-            ['en-US'] = 'C:/Users/eduar/AppData/Local/nvim/.ltex/dictionary.txt',
-            ['es'] = {},
-          },
-          enabled = { 'markdown', 'text' },
-        },
+        -- ltex = {
+        --   language = 'en-US',
+        --   additionalRules = {
+        --     languageModel = { 'es', 'en-US' },
+        --   },
+        --   dictionary = {
+        --     ['en-US'] = 'C:/Users/eduar/AppData/Local/nvim/.ltex/dictionary.txt',
+        --     ['es'] = {},
+        --   },
+        --   enabled = { 'markdown', 'text' },
+        -- },
         jsonls = {
-          -- cmd = { ... },
-          -- filetypes = { ... },
-          -- capabilities = {},
           settings = {
             json = {
               schemas = require('schemastore').json.schemas(),
               validate = { enable = true },
             },
           },
+        },
+        html = {},
+        emmet_ls = {
+          filetypes = { 'html', 'css', 'razor', 'cshtml', 'javascriptreact', 'typescriptreact' },
+          init_options = { includeLanguages = { razor = 'html', cshtml = 'html' } },
         },
       }
 
@@ -876,7 +892,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         cs = { 'csharpier' },
-        json = { 'jq' },
+        json = { 'clang-format', 'jq' },
         sql = { 'sleek' },
         xml = { 'xmllint' },
         -- Conform can also run multiple formatters sequentially
@@ -886,14 +902,14 @@ require('lazy').setup({
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
       },
       formatters = {
-        csharpier = {
-          command = 'csharpier',
-          args = {
-            'format',
-            '--write-stdout',
-          },
-          to_stdion = true,
-        },
+        -- csharpier = {
+        --   command = 'csharpier',
+        --   args = {
+        --     'format',
+        --     '--write-stdout',
+        --   },
+        --   to_stdion = true,
+        -- },
       },
     },
   },
@@ -1194,9 +1210,10 @@ require('lazy').setup({
         'vim',
         'vimdoc',
         'gitignore',
+        'git_config',
         'json',
         'c_sharp',
-        -- 'latex',
+        'razor',
         'typst',
         'yaml',
         'python',

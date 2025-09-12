@@ -15,7 +15,8 @@ return {
     -- banner_name = 'dos_rebel'
     -- banner_name = 'lean'
     -- local banner_name = 'morse'
-    img_name = 'cacodemon'
+    -- img_name = 'cacodemon'
+    img_name = 'DooM'
     -- local banner_name
 
     --- @return { header_table: table, padding: { top: number, bottom: number } }
@@ -56,26 +57,31 @@ return {
           if img_name == 'cacodemon' then
             return { top = 1, bottom = 1 }
           end
+          if img_name == 'DooM' then
+            return { top = 1, bottom = 8 }
+          end
+          return { top = 1, bottom = 1 }
         end
         local padding = get_padding()
         return { header_table = header_table, padding = padding }
       end
-      return { top = 0, bottom = 0 }
+      return { header_table = {}, padding = { top = 1, bottom = 1 } }
     end
 
     local header_padding = get_header_padding()
     local logo, padding = header_padding.header_table, header_padding.padding
     local top, bottom = padding.top, padding.bottom
-    for i = 1, top do
-      table.insert(logo, 1, '')
-    end
-    for i = 1, bottom do
-      table.insert(logo, '')
-    end
 
     local nvim_version = '' .. 'N E O V I M - v ' .. version.major .. '.' .. version.minor
     table.insert(logo, nvim_version)
     table.insert(logo, '')
+
+    for _ = 1, top do
+      table.insert(logo, 1, '')
+    end
+    for _ = 1, bottom do
+      table.insert(logo, '')
+    end
 
     local center = {
       {

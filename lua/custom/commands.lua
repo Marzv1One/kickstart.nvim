@@ -262,7 +262,7 @@ end, { nargs = '*' })
 
 -- set local nowrap
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'markdown', 'text', 'csv', 'log' },
+  pattern = { 'markdown', 'text', 'csv', 'log', 'json', 'yaml', 'toml', 'gitignore' },
   callback = function()
     vim.opt_local.wrap = false
   end,

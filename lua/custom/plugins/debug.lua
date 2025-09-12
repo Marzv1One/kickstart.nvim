@@ -63,7 +63,7 @@ return {
       map('n', '<leader>ds', function()
         widgets.centered_float(widgets.scopes)
       end, { desc = 'Scopes' })
-      map('n', '<leader>dt', '<cmd>DapViewToggle', { desc = 'Toggle DAP View' })
+      map('n', '<leader>dt', '<cmd>DapViewToggle<CR>', { desc = 'Toggle DAP View' })
 
       -- .NET specific setup using `easy-dotnet`
       require('easy-dotnet.netcoredbg').register_dap_variables_viewer() -- special variables viewer specific for .NET
@@ -139,6 +139,11 @@ return {
         command = 'netcoredbg',
         args = { '--interpreter=vscode' },
       }
+
+      local whichkey = require 'which-key'
+      vim.keymap.set('n', '<leader>d<leader>', function()
+        whichkey.show { keys = '<leader>d', loop = true }
+      end)
     end,
   },
 }
