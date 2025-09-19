@@ -1,60 +1,44 @@
-local my_function = function(args)
-  local scrolloff = vim.o.scrolloff
-  -- local win_height = vim.api.nvim_win_get_height(0)
-  -- local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
-  local lnum = args.lnum
-  local buf_line_count = vim.api.nvim_buf_line_count(0)
-
+local function is_hml_line(args)
+  local so = vim.o.scrolloff
   local topline = vim.fn.line 'w0'
   local bottomline = vim.fn.line 'w$'
-
-  -- local H_line = math.min(bottomline, topline + scrolloff)
-  -- local M_line = math.floor((topline + bottomline) / 2)
-  -- local L_line = math.max(topline, bottomline - scrolloff)
-
-  -- H (High): top of screen + scrolloff (unless at top of file)
-  local H_line
-  if topline == 1 then
-    H_line = 1
-  else
-    H_line = math.min(bottomline, topline + scrolloff)
-  end
-
-  -- M (Middle): actual screen middle (no edge case needed)
-  local M_line = math.floor((topline + bottomline) / 2)
-
-  -- L (Low): bottom of screen - scrolloff (unless at bottom of file)
-  local L_line
-  if bottomline == buf_line_count then
-    L_line = buf_line_count
-  else
-    L_line = math.max(topline, bottomline - scrolloff)
-  end
-
-  -- Compute relative numbers
-  -- local rel_H = H_line - lnum
-  -- local rel_M = M_line - lnum
-  -- local rel_L = L_line - lnum
-
-  return L_line == lnum or H_line == lnum or M_line == lnum
-
-  -- return (H_line + math.abs(rel_H) == L_line)
-
-  -- return (H_line + math.abs(rel_H) == L_line) and rel_L ~= 0
-
-  -- return (cursor_line ~= topline and math.abs(rel_H) + math.abs(rel_M) == 3 * scrolloff)
-
-  -- return (rel_H == 0 and math.abs(rel_H) + math.abs(rel_M) == 20) or (rel_L == 0 and math.abs(rel_M) + math.abs(rel_L) == 20)
+  local height = vim.api.nvim_win_get_height(0)
+  local r = args.lnum - topline + 1
+  if r <= 0 or r > height then return false end
+  local at_top = topline == 1
+  local at_bottom = bottomline == vim.api.nvim_buf_line_count(0)
+  local H_row = at_top and 1 or math.min(height, 1 + so)
+  local L_row = at_bottom and height or math.max(1, height - so - 1)
+  local M_row = math.floor((1 + height) / 2)
+  return r == H_row or r == M_row or r == L_row
 end
 
-local function get_character(args)
-  -- vim.notify(vim.inspect(args), vim.log.levels.INFO)
-  local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
-  if args.lnum ~= cursor_line then
-    return '   ┃'
+local last_win, last_tick, printed = nil, 0, 0
+local function debug_once_per_screen(msg)
+  local w = vim.api.nvim_get_current_win()
+  local tick = vim.b.changedtick or 0
+  if w ~= last_win or tick ~= last_tick then
+    last_win, last_tick, printed = w, tick, 0
   end
-  return require('statuscol.builtin').lnumfunc(args) .. ' '
-  -- return '  ┃'
+  if printed < 41 then
+    printed = printed + 1
+    -- vim.notify(vim.inspect(msg), vim.log.levels.INFO)
+  end
+end
+
+local function bar_cell(args)
+  local target = (args.relnum == 0) and 2 or 3
+  local s = '┃'
+  local pad = math.max(0, target - vim.fn.strdisplaywidth(s))
+  return string.rep(' ', pad) .. s
+end
+
+local function get_hml_character(args)
+  local builtin_statuscol = require 'statuscol.builtin'
+  if args.relnum ~= 0 then
+    return bar_cell(args)
+  end
+  return builtin_statuscol.lnumfunc(args) .. ' '
 end
 
 return {
@@ -65,7 +49,11 @@ return {
       vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
       vim.o.foldlevel = 99
       vim.o.foldlevelstart = 99
-      -- vim.o.foldenable = true
+      vim.api.nvim_create_autocmd({ 'WinScrolled', 'BufWinEnter', 'BufEnter', 'CursorMoved', 'CursorMovedI' }, {
+        callback = function()
+          pcall(vim.cmd.redrawstatus)
+        end,
+      })
     end,
     dependencies = {
       'kevinhwang91/promise-async',
@@ -81,20 +69,12 @@ return {
               { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
               {
                 text = { builtin.lnumfunc, ' ' },
-                condition = {
-                  function(args)
-                    return not my_function(args)
-                  end,
-                },
-                -- condition = { true, builtin.not_empty },
+                condition = { function(a) return not is_hml_line(a) end },
                 click = 'v:lua.ScLa',
               },
               {
-                text = { get_character, ' ' },
-                -- text = { '  ┃', ' ' },
-                condition = {
-                  my_function,
-                },
+                text = { get_hml_character, ' ' },
+                condition = { is_hml_line },
                 hl = 'Number',
               },
             },
@@ -106,22 +86,18 @@ return {
     event = 'LspAttach',
     config = function()
       local handler = function(virtText, lnum, endLnum, width, truncate)
-        local newVirtText = {}
-        local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+        local newVirtText, suffix = {}, (' 󰁂 %d '):format(endLnum - lnum)
         local sufWidth = vim.fn.strdisplaywidth(suffix)
-        local targetWidth = width - sufWidth
-        local curWidth = 0
+        local targetWidth, curWidth = width - sufWidth, 0
         for _, chunk in ipairs(virtText) do
-          local chunkText = chunk[1]
+          local chunkText, hlGroup = chunk[1], chunk[2]
           local chunkWidth = vim.fn.strdisplaywidth(chunkText)
           if targetWidth > curWidth + chunkWidth then
             table.insert(newVirtText, chunk)
           else
             chunkText = truncate(chunkText, targetWidth - curWidth)
-            local hlGroup = chunk[2]
             table.insert(newVirtText, { chunkText, hlGroup })
             chunkWidth = vim.fn.strdisplaywidth(chunkText)
-            -- str width returned from truncate() may less than 2nd argument, need padding
             if curWidth + chunkWidth < targetWidth then
               suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
             end
@@ -132,76 +108,63 @@ return {
         table.insert(newVirtText, { suffix, 'MoreMsg' })
         return newVirtText
       end
-      ---@diagnostic disable-next-line: missing-fields
+
       require('ufo').setup {
-        -- fold_virt_text_handler = handler,
+        fold_virt_text_handler = handler,
       }
 
-      local is_enable = function(bufnr)
-        -- local bufnr = vim.api.nvim_get_current_buf()
-        local status = require('ufo.main').inspectBuf(bufnr)
-        if not status then
-          return
+      local function ufo_is_enabled(bufnr)
+        local s = require('ufo.main').inspectBuf(bufnr)
+        if not s then
+          return false
         end
-        local is_enable = status[2]
-        is_enable = is_enable:gsub('Fold Status: ', '')
-        return is_enable == 'start'
+        return s[1] == true
       end
-      local disable_if_enable = function()
+
+      local function disable_if_enabled()
         local bufnr = vim.api.nvim_get_current_buf()
-        local enable = is_enable(bufnr)
-        if enable then
+        if ufo_is_enabled(bufnr) then
           require('ufo').disableFold(bufnr)
         end
       end
-      local enable_if_disable = function()
+
+      local function enable_if_disabled()
         local bufnr = vim.api.nvim_get_current_buf()
-        local enable = is_enable(bufnr)
-        if not enable then
+        if not ufo_is_enabled(bufnr) then
           require('ufo').enableFold(bufnr)
         end
       end
-      -- local toggle_disable = function()
-      --   local bufnr = vim.api.nvim_get_current_buf()
-      --   local is_enable = is_enable(bufnr)
-      --   if is_enable then
-      --     require('ufo').disableFold(bufnr)
-      --   else
-      --     require('ufo').enableFold(bufnr)
-      --   end
-      -- end
 
-      function Origami_l()
-        disable_if_enable()
+      local function origami_l()
+        disable_if_enabled()
         require('origami').l()
       end
-      function Origami_zo()
-        disable_if_enable()
-        vim.cmd 'normal zo'
+      local function origami_zo()
+        disable_if_enabled()
+        vim.cmd.normal 'zo'
       end
-      function Origami_zO()
-        disable_if_enable()
-        vim.cmd 'normal zO'
+      local function origami_zO()
+        disable_if_enabled()
+        vim.cmd.normal 'zO'
       end
-      function Origami_h()
+      local function origami_h()
         local col = vim.fn.col '.'
         local non_blank = vim.api.nvim_get_current_line():match('^%s*'):len() + 1
         if col <= non_blank then
-          enable_if_disable()
+          enable_if_disabled()
         end
         require('origami').h()
       end
 
-      local map = function(keys, fun, desc)
+      local function map(keys, fun, desc)
         vim.keymap.set('n', keys, fun, { desc = 'UFO: ' .. desc })
       end
 
-      map('l', function()
-        Origami_l()
-      end, 'Toggle fold')
-      map('h', function()
-        Origami_h()
-      end, 'Toggle fold')
+      map('zl', origami_l, 'Toggle fold')
+      map('zh', origami_h, 'Toggle fold')
+      map('zo', origami_zo, 'Open fold')
+      map('zO', origami_zO, 'Open folds recursively')
+
       map('zR', function()
         require('ufo').openAllFolds()
       end, 'Open all folds')

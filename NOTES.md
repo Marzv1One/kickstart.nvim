@@ -1,62 +1,30 @@
-# TODO
+# Plan: nvim-ufo H/M/L markers and folding UX
 
-## Plugins to installed
-- [x] winsurf
-- [x] toogleterm
-- [x] satellite
-- [x] hover
-- [x] hearline (statusline)
-- [x] nvim-dap, dap-view
-- [x] noice, trouble
-- [x] nvim-ufo
-- [x] navbuddy
-- [x] smart-column
-- [x] nvim-spider, nvim-scissos, dr-lsp, origami
-- [x] arrow
-- [x] kulala
-- [x] transparent
-- [x] treesj
-- [x] focus
-- [x] better diagnostics
-- [x] window border highlight
-- [x] smooth cursor
-- [x] inc-rename
-- [x] transparent
-- [x] dashboard
-- [ ] hardtime
-- [ ] WezTerm plugins
-- [x] neo composer
-- [?] dial
-- [?] gx
-- [?] image preview
-- [ ] nvim ts autotag
-- [ ] peek
-- [?] treesitter playground
-- [?] crates
+## Summary
+- Highlight H/M/L target rows in statuscolumn with minimal overhead.
+- Robust redraw: avoid duplicate autocommands on reload.
+- Reduce recomputation and expensive calls for better perf.
+- Harden requires and mappings to align with Neovim APIs.
 
-## To Set up
-- [x] set pwsh as Neovim terminal
-- [x] Fzf for gopass
-- [x] Debugger for dotnet
-- [x] Fzf for yanky
-- [x] Fzf for persisted
-- [x] Fzf for undotree
-- [x] Kanagawa <3
-- [x] sleek
-- [x] xmllint
-- [x] down arrow nvim-ufo
-- [x] emoji blink-cmp
-- [x] JSON LSP
-- [ ] YAML LSP
-- [ ] TOML LSP
+## Tasks
+1) Autocmd hygiene
+- Create augroup for redrawstatus on WinScrolled/BufWinEnter/BufEnter/CursorMoved/CursorMovedI.
 
+2) Statuscolumn H/M/L logic
+- Hoist require('statuscol.builtin') with pcall; soft-fail if missing.
+- Swap vim.fn.strdisplaywidth -> vim.api.nvim_strwidth.
+- Precompute window metrics and H/M/L rows once per eval; pass to predicate.
+- Fast-path for non-cursor lines (relnum ~= 0) to emit bar cell quickly.
+- Remove or gate debug helpers.
 
-### other way to sync lazy
-nvim --headless "+Lazy sync" +qa
+3) Fold UI and integration
+- Keep fold_virt_text_handler, minor cleanup only.
+- Enable/disable helpers via ufo.main.inspectBuf; concise boolean.
+- Origami actions temporarily disable UFO; re-enable when at line start.
+- Use vim.cmd.normal({...}) API form.
 
-#### not g<key> keymaps set
-- ga ?
-- gl
-- gy
-- gz
+4) Keymaps
+- Use zl/zh/zo/zO for origami; zR/zM/zr/zm/[Z/]Z for ufo with "UFO:" desc.
 
+5) Style & tooling
+- Localize helpers; no globals. Follow Stylua. Run stylua . after changes.
