@@ -4,7 +4,9 @@ local function is_hml_line(args)
   local bottomline = vim.fn.line 'w$'
   local height = vim.api.nvim_win_get_height(0)
   local r = args.lnum - topline + 1
-  if r <= 0 or r > height then return false end
+  if r <= 0 or r > height then
+    return false
+  end
   local at_top = topline == 1
   local at_bottom = bottomline == vim.api.nvim_buf_line_count(0)
   local H_row = at_top and 1 or math.min(height, 1 + so)
@@ -27,18 +29,22 @@ local function debug_once_per_screen(msg)
 end
 
 local function bar_cell(args)
-  local target = (args.relnum == 0) and 2 or 3
+  local target = 3 --[[ (args.relnum == 0) and 2 or 3 ]]
   local s = '┃'
   local pad = math.max(0, target - vim.fn.strdisplaywidth(s))
   return string.rep(' ', pad) .. s
 end
 
+local builtin_statuscol_ok, builtin_statuscol = pcall(require, 'statuscol.builtin')
+
 local function get_hml_character(args)
-  local builtin_statuscol = require 'statuscol.builtin'
   if args.relnum ~= 0 then
     return bar_cell(args)
   end
-  return builtin_statuscol.lnumfunc(args) .. ' '
+  if not builtin_statuscol_ok then
+    return ' ' .. tostring(args.lnum)
+  end
+  return builtin_statuscol.lnumfunc(args)
 end
 
 return {
@@ -63,7 +69,10 @@ return {
         'luukvbaal/statuscol.nvim',
         name = 'statuscol',
         config = function()
-          local builtin = require 'statuscol.builtin'
+          local ok, builtin = pcall(require, 'statuscol.builtin')
+          if not ok then
+            return
+          end
           require('statuscol').setup {
             relculright = true,
             segments = {
@@ -71,7 +80,11 @@ return {
               { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
               {
                 text = { builtin.lnumfunc, ' ' },
-                condition = { function(a) return not is_hml_line(a) end },
+                condition = {
+                  function(a)
+                    return not is_hml_line(a)
+                  end,
+                },
                 click = 'v:lua.ScLa',
               },
               {
