@@ -1,18 +1,22 @@
-local function is_hml_line(args)
+local function compute_rows()
   local so = vim.o.scrolloff
-  local topline = vim.fn.line 'w0'
-  local bottomline = vim.fn.line 'w$'
-  local height = vim.api.nvim_win_get_height(0)
-  local r = args.lnum - topline + 1
-  if r <= 0 or r > height then
+  local top = vim.fn.line 'w0'
+  local bot = vim.fn.line 'w$'
+  local h = vim.api.nvim_win_get_height(0)
+  local at_top = top == 1
+  local at_bot = bot == vim.api.nvim_buf_line_count(0)
+  local H = at_top and 1 or math.min(h, 1 + so)
+  local L = at_bot and h or math.max(1, h - so - 1)
+  local M = math.floor((1 + h) / 2)
+  return { H = H, M = M, L = L, top = top, h = h }
+end
+
+local function is_hml_line(args, rows)
+  local r = args.lnum - rows.top + 1
+  if r <= 0 or r > rows.h then
     return false
   end
-  local at_top = topline == 1
-  local at_bottom = bottomline == vim.api.nvim_buf_line_count(0)
-  local H_row = at_top and 1 or math.min(height, 1 + so)
-  local L_row = at_bottom and height or math.max(1, height - so - 1)
-  local M_row = math.floor((1 + height) / 2)
-  return r == H_row or r == M_row or r == L_row
+  return r == rows.H or r == rows.M or r == rows.L
 end
 
 local last_win, last_tick, printed = nil, 0, 0
@@ -79,17 +83,31 @@ return {
               { text = { '%s' }, click = 'v:lua.ScSa' },
               { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
               {
-                text = { builtin.lnumfunc, ' ' },
+                text = {
+                  function(a)
+                    return builtin.lnumfunc(a)
+                  end,
+                  ' ',
+                },
                 condition = {
                   function(a)
-                    return not is_hml_line(a)
+                    return not is_hml_line(a, compute_rows())
                   end,
                 },
                 click = 'v:lua.ScLa',
               },
               {
-                text = { get_hml_character, ' ' },
-                condition = { is_hml_line },
+                text = {
+                  function(a)
+                    return get_hml_character(a, compute_rows())
+                  end,
+                  ' ',
+                },
+                condition = {
+                  function(a)
+                    return is_hml_line(a, compute_rows())
+                  end,
+                },
                 hl = 'Number',
               },
             },
