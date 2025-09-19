@@ -9,14 +9,18 @@ return {
     local img_name
     -- local banner_name = 'def_leppard'
     -- banner_name = 'bloody'
-    -- local banner_name = 'slant_relief'
     -- banner_name = 'sharp'
     -- banner_name = 'ansi_shadow'
     -- banner_name = 'dos_rebel'
     -- banner_name = 'lean'
     -- local banner_name = 'morse'
     -- img_name = 'cacodemon'
-    img_name = 'DooM'
+    -- img_name = 'DooM'
+    -- img_name = 'bat_99'
+    -- banner_name = 'elite'
+    -- banner_name = 'decimal'
+    -- banner_name = 'slant_relief'
+    banner_name = 'sharp'
     -- local banner_name
 
     --- @return { header_table: table, padding: { top: number, bottom: number } }
@@ -48,6 +52,12 @@ return {
           if banner_name == 'dos_rebel' then
             return { top = 12, bottom = 14 }
           end
+          if banner_name == 'elite' then
+            return { top = 12, bottom = 14 }
+          end
+          if banner_name == 'decimal' then
+            return { top = 10, bottom = 16 }
+          end
         end
         local padding = get_padding()
         return { header_table = header_table, padding = padding }
@@ -59,6 +69,9 @@ return {
           end
           if img_name == 'DooM' then
             return { top = 1, bottom = 8 }
+          end
+          if img_name == 'bat_99' then
+            return { top = 1, bottom = 9 }
           end
           return { top = 1, bottom = 1 }
         end
@@ -72,16 +85,16 @@ return {
     local logo, padding = header_padding.header_table, header_padding.padding
     local top, bottom = padding.top, padding.bottom
 
-    local nvim_version = '' .. 'N E O V I M - v ' .. version.major .. '.' .. version.minor
-    table.insert(logo, nvim_version)
-    table.insert(logo, '')
-
     for _ = 1, top do
       table.insert(logo, 1, '')
     end
     for _ = 1, bottom do
       table.insert(logo, '')
     end
+
+    local nvim_version = '' .. 'N E O V I M - v ' .. version.major .. '.' .. version.minor
+    table.insert(logo, nvim_version)
+    table.insert(logo, '')
 
     local center = {
       {

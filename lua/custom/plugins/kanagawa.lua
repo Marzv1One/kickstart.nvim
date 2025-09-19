@@ -132,7 +132,7 @@ return {
             underline = true,
           },
           EyelinerDimmed = { fg = c(theme.ui.fg_dim):blend(theme.ui.bg, 0.85):to_hex() },
-          MatchParen = { fg = theme.syn.special2, bold = true },
+          MatchParen = { fg = theme.syn.special2, bold = true, underline = true },
           -- MatchParen = { fg = theme.diag.warning, bold = true },
           CursorLineNr = { fg = theme.syn.number, bold = true },
 

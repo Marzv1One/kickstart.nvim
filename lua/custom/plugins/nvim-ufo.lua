@@ -49,7 +49,9 @@ return {
       vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
       vim.o.foldlevel = 99
       vim.o.foldlevelstart = 99
+      local grp = vim.api.nvim_create_augroup('UfoRedrawStatus', { clear = true })
       vim.api.nvim_create_autocmd({ 'WinScrolled', 'BufWinEnter', 'BufEnter', 'CursorMoved', 'CursorMovedI' }, {
+        group = grp,
         callback = function()
           pcall(vim.cmd.redrawstatus)
         end,

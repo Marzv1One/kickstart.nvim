@@ -1,4 +1,0 @@
--- local M = {}
---
--- ---@param bufnr integer
--- return M
