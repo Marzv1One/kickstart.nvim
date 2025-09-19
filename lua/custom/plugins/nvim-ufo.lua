@@ -1,13 +1,14 @@
 local function compute_rows()
-  local so = vim.o.scrolloff
-  local top = vim.fn.line 'w0'
-  local bot = vim.fn.line 'w$'
-  local h = vim.api.nvim_win_get_height(0)
+  local win = vim.api.nvim_get_current_win()
+  local so = vim.wo[win].scrolloff or vim.o.scrolloff
+  local top = vim.fn.line('w0')
+  local bot = vim.fn.line('w$')
+  local h = bot - top + 1
   local at_top = top == 1
   local at_bot = bot == vim.api.nvim_buf_line_count(0)
   local H = at_top and 1 or math.min(h, 1 + so)
-  local L = at_bot and h or math.max(1, h - so - 1)
-  local M = math.floor((1 + h) / 2)
+  local L = at_bot and h or math.max(1, h - so)
+  local M = math.floor((h + 1) / 2)
   return { H = H, M = M, L = L, top = top, h = h }
 end
 
@@ -48,7 +49,10 @@ local function get_hml_character(args)
   if not builtin_statuscol_ok then
     return ' ' .. tostring(args.lnum)
   end
-  return builtin_statuscol.lnumfunc(args)
+  local n = tostring(args.lnum)
+  local pad = (#n == 3) and '' or ''
+  return (builtin_statuscol_ok and builtin_statuscol.lnumfunc(args) or n) .. pad
+  -- return builtin_statuscol.lnumfunc(args)
 end
 
 return {
@@ -99,7 +103,7 @@ return {
               {
                 text = {
                   function(a)
-                    return get_hml_character(a, compute_rows())
+                    return get_hml_character(a)
                   end,
                   ' ',
                 },
