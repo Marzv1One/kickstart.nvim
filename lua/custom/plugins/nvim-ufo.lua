@@ -1,16 +1,59 @@
+local printed = 0
 local function compute_rows()
   local win = vim.api.nvim_get_current_win()
   local so = vim.wo[win].scrolloff or vim.o.scrolloff
-  local top = vim.fn.line('w0')
-  local bot = vim.fn.line('w$')
-  local h = bot - top + 1
+  local top = vim.fn.line 'w0'
+  local bot = vim.fn.line 'w$'
   local at_top = top == 1
   local at_bot = bot == vim.api.nvim_buf_line_count(0)
+
+  local segments = {}
+  local l = top
+  while l <= bot do
+    local fc = vim.fn.foldclosed(l)
+    if fc ~= -1 then
+      local fe = vim.fn.foldclosedend(l)
+      table.insert(segments, { start = l, finish = fe })
+      l = fe + 1
+    else
+      table.insert(segments, { start = l, finish = l })
+      l = l + 1
+    end
+  end
+  if printed < 0 then
+    printed = printed + 1
+    print(vim.inspect(segments))
+  end
+
+  local vis_rows = 0
+  for _, seg in ipairs(segments) do
+    vis_rows = vis_rows + (seg.finish - seg.start + 1)
+  end
+
+  local h = vis_rows
   local H = at_top and 1 or math.min(h, 1 + so)
   local L = at_bot and h or math.max(1, h - so)
-  local M = math.floor((h + 1) / 2)
+
+  local mid_vis = math.ceil(vis_rows / 2)
+  local acc, M_abs = 0, top
+  for _, seg in ipairs(segments) do
+    local seg_len = seg.finish - seg.start + 1
+    if acc + seg_len >= mid_vis then
+      M_abs = seg.start + (mid_vis - acc) - 1
+      break
+    end
+    acc = acc + seg_len
+  end
+  local M = M_abs - top + 1
+
   return { H = H, M = M, L = L, top = top, h = h }
 end
+
+vim.keymap.set('n', '<localleader>h', function()
+  printed = 0
+  local rows = compute_rows()
+  print(vim.inspect(rows))
+end, { desc = '' })
 
 local function is_hml_line(args, rows)
   local r = args.lnum - rows.top + 1
